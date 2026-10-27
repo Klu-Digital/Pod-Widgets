@@ -1,7 +1,6 @@
 # Prompts
 
-The prompts I typed into Claude Code while building this project, oldest first, grouped by session.
-Prompts given to sub-agents and Orca workers are left out, as are `/clear` and `/model`.
+The prompts I typed into Claude Code while building this project, oldest first, grouped by session. Prompts given to sub-agents and Orca workers are left out, as are `/clear` and `/model`.
 
 ## Session 1 (2026-10-27 19:43)
 
@@ -42,7 +41,7 @@ Some things to consider:
     - possibly use optimistic updates here to optimize the experience of the user
 - add this to your memory: don't overkill the tests -- just test core functionality. we don't need tests for every single thing
     - use `vp` (vite plus) for running tests
-    - use `testcontainers` to run mock dbs 
+    - use `testcontainers` to run mock dbs
 
 Please create GitHub issues through the `gh` cli. Create Epics and create tickets under those epics. Please be cautious of the time -- this should all be doable in 90 minutes.
 Do not output actual code yet.
@@ -53,15 +52,15 @@ The issues should appear in https://github.com/Klu-Digital/Pod-Widgets/issues
 
 ### 2026-10-27 19:44
 
-````text
+```text
 also, per epic, please mention parallelizable issues
-````
+```
 
 ## Session 2 (2026-10-27 19:55)
 
 ### 2026-10-27 19:55
 
-````text
+```text
 /orchestration Please implement this Epic:
 https://github.com/Klu-Digital/Pod-Widgets/issues/1
 
@@ -73,11 +72,11 @@ Use `gh` to update issues accordingly e.g. inprogress, complete, etc.
 Don't push anything yet.
 
 After everything, provide a guide on how a human like me should review the changes.
-````
+```
 
 ### 2026-10-27 20:08
 
-````text
+```text
 /orchestration https://github.com/Klu-Digital/Pod-Widgets/issues
 
 Please use the `gh` cli to view the issues.
@@ -89,21 +88,21 @@ Please do an initial batch of changes that are parallelizable. Update issues/epi
 Don't do everything in one go -- batch the changes so it's managable to review the changes.
 
 After everything, provide a guide on how a human like me should review the changes.
-````
+```
 
 ### 2026-10-27 20:50
 
-````text
-Please provide the prompt to run for the next batch. 
+```text
+Please provide the prompt to run for the next batch.
 I'll pass it into another session to clear the context.
 I've reviewed the work and it looks sound.
-````
+```
 
 ## Session 3 (2026-10-27 20:56)
 
 ### 2026-10-27 20:56
 
-````text
+```text
 /orchestration Run wave 2 of https://github.com/Klu-Digital/Pod-Widgets/issues (use the `gh` CLI to read issues/epics).
 
 Roles: you are the orchestrator. Use Haiku 5.5 (`--model claude-haiku-5-5`) for read-only scouts and Sonnet 5.5 high (`--model claude-sonnet-5-5 --effort high`) for implementation. Create Orca worktrees/terminals as needed. Do NOT push anything.
@@ -144,20 +143,20 @@ Do NOT start #11 yet. It needs #9 approved first and will be wave 3.
 
 ## Finish with
 A human review guide like wave 1's: a branch/commit table, decisions to sanity-check, a per-ticket review order with the files to scrutinise, how to run it locally (fresh browser → name prompt; refresh → no prompt; a request without headers → 400), and the recommended merge path (`--ff-only` of the integration branch). Then give me the prompt for wave 3 (#11, then #12 + #15 in parallel).
-````
+```
 
 ### 2026-10-27 21:23
 
-````text
+```text
 please merge by ticket into main and use conventional commit messages. i don't want to run a single merge command since history might be lost.
 pls remember that this is the preferred merge strategy
-````
+```
 
 ## Session 4 (2026-10-27 21:27)
 
 ### 2026-10-27 21:27
 
-````text
+```text
 /orchestration Run wave 3 of https://github.com/Klu-Digital/Pod-Widgets/issues (use `gh`).
 
 Roles: you orchestrate. Haiku 5.5 (`--model claude-haiku-5-5`) for read-only scouts, Sonnet 5.5 high (`--model claude-sonnet-5-5 --effort high`) for implementation. Do NOT push.
@@ -188,30 +187,30 @@ Roles: you orchestrate. Haiku 5.5 (`--model claude-haiku-5-5`) for read-only sco
 A human review guide (branch/commit table, decisions, per-ticket review order + files, how to run locally: add widgets, type, refresh → persists; no identity → 400), recommended merge path (`--ff-only` of the integration branch), and the prompt for wave 4 (#16 + #21 real deploy, then stretch #17–#20).
 
 The scout reports and review notes are in /private/tmp/claude-501/-Users-kevinmallari-Developer-Pod-Widgets/1c114647-2e84-47b9-a8bf-398605e3921a/scratchpad/ (review-9.md, review-21.md, review-integration.md).
-````
+```
 
 ### 2026-10-27 21:56
 
-````text
+```text
 I've reviewed the changes, please remove any image widget references. I'm deferring that due to lack of time.
 nothing else other than that. please merge changes into main using convetional commits
-````
+```
 
 ## Session 5 (2026-10-27 21:34)
 
 ### 2026-10-27 21:34
 
-````text
+```text
 https://github.com/Klu-Digital/Pod-Widgets/issues (use `gh`).
 Please update issues that are done, unblocked, etc.
 Base the information from the commits in this branch
-````
+```
 
 ## Session 6 (2026-10-27 22:00)
 
 ### 2026-10-27 22:00
 
-````text
+```text
 /orchestration Run wave 4 of https://github.com/Klu-Digital/Pod-Widgets/issues (use `gh`). Waves 1–3 are on main (#11 widget API, #12 db tests, #15 widget board at d4794e0).
 
 Scope: #16, #17, #20 only. Out of scope: #18 and #19 (deferred for time; image widgets were removed from the API in 7e24be7, and the board shows the oldest page) and #21 (I'm deploying myself). Don't touch those.
@@ -237,42 +236,42 @@ Conflict watch: #16 and #17 both touch the widget registry and text-widget/frame
 A human review guide (branch/commit table, decisions, per-ticket review order + files, how to run locally: delete + undo, add/edit a banner, open the audit log), the per-ticket `--no-ff` merge commands into main with conventional messages, and a short list of what remains (#18, #19 deferred; #21 manual).
 
 Prior notes: /private/tmp/claude-501/-Users-kevinmallari-Developer-Pod-Widgets/88ff8c6b-660a-45e4-8131-6a619173374b/scratchpad/ (scout-*.md, review-*.md, review-integration.md).
-````
+```
 
 ### 2026-10-27 22:33
 
-````text
+```text
 please merge the changes individually to main and update the tickets accordingly
-````
+```
 
 ## Session 7 (2026-10-27 22:39)
 
 ### 2026-10-27 22:39
 
-````text
-please display the widgets as html/text inside the cards. add an edit button per widget, which should put the content inside the rich text editor. problem right now is that i always see rich text editors, which is not good UI/UX @apps/web/src/components/widgets/widget-board.tsx 
+```text
+please display the widgets as html/text inside the cards. add an edit button per widget, which should put the content inside the rich text editor. problem right now is that i always see rich text editors, which is not good UI/UX @apps/web/src/components/widgets/widget-board.tsx
 add tests for this'
-````
+```
 
 ### 2026-10-27 22:40
 
-````text
+```text
 or better yet, when clicking on the text, make it editable and make the rich text formatting (bold, italics, etc.) floating
-````
+```
 
 ## Session 8 (2026-10-27 23:02)
 
 ### 2026-10-27 23:02
 
-````text
+```text
 please deprecate unused code and infrastructure
-````
+```
 
 ## Session 9 (2026-10-27 23:26)
 
 ### 2026-10-27 23:26
 
-````text
+```text
 are you able to put all my prompts in the project in a PROMPTS.md file?
 note: MY PROMPTS -- so don't include prompts you passed into sub-agents
-````
+```
