@@ -13,12 +13,12 @@ pnpm secrets:check
 Then bring up the backing services and the schema:
 
 ```bash
-docker compose up -d postgres redis minio minio-init
+docker compose up -d postgres minio minio-init
 pnpm db:deploy
 pnpm dev
 ```
 
-`pnpm db:deploy` is the composite one — drizzle migrations, then pg-boss's own schema, then any pending post-migration scripts. Running only `pnpm db:migrate` leaves the queue schema absent, and the server will log `queue.start_failed` and serve reads with enqueueing broken.
+`pnpm db:deploy` is the composite one — drizzle migrations, then any pending post-migration scripts. Running only `pnpm db:migrate` skips the scripts, so reference rows such as the default page never appear.
 
 Ports are deliberately not all upstream defaults; see the table in the README.
 
@@ -38,11 +38,11 @@ Lefthook installs a pre-commit hook that runs oxlint and oxfmt over staged files
 
 Three vitest projects, split by what they need rather than by what they cover. The file name is what routes a test, so the suffix is not cosmetic:
 
-| Project | Files | Environment |
-| --- | --- | --- |
-| `unit` | `*.test.ts` outside apps/web | node, no I/O |
-| `db` | `*.db.test.ts` | node, real Postgres + Redis in Docker |
-| `web` | `apps/web/**/*.test.{ts,tsx}` | jsdom |
+| Project | Files                         | Environment                   |
+| ------- | ----------------------------- | ----------------------------- |
+| `unit`  | `*.test.ts` outside apps/web  | node, no I/O                  |
+| `db`    | `*.db.test.ts`                | node, real Postgres in Docker |
+| `web`   | `apps/web/**/*.test.{ts,tsx}` | jsdom                         |
 
 ```bash
 pnpm test:unit
@@ -51,7 +51,7 @@ pnpm test:web
 pnpm test:watch
 ```
 
-`db` tests get a real Postgres via testcontainers, migrated once per run, and each worker gets its own numbered Redis logical database that is flushed between tests. Point the suite at a Redis you care about and it will erase it.
+`db` tests get a real Postgres via testcontainers, migrated once per run into a template that each worker clones, and every table is truncated between tests.
 
 Reach for a `.db.test.ts` when the thing under test is the SQL or the transaction boundary. Everything else is cheaper and faster as a unit test — see `apps/server/src/metrics.test.ts` for the module-mocking pattern that gets around `@trumpet-pods/env/server` freezing its config at import.
 
@@ -71,9 +71,9 @@ Post-migration scripts are for data, because a migration holds schema changes on
 
 **Comments explain why, not what.** The existing ones are long where the reasoning is non-obvious — read a few before writing your own. Anything that took an afternoon to work out belongs in a comment or in the README's "things that bite" lists, because the next person will otherwise spend the same afternoon.
 
-**Add an API procedure at the right rung of the ladder** in `packages/api/src/procedures.ts`: `publicProcedure` for reads, `mutationProcedure` when it writes. A mutation that invalidates a cache must do it through `context.afterCommit(...)`, never inline — the handler runs inside an open transaction.
+**Add an API procedure at the right rung of the ladder** in `packages/api/src/procedures.ts`: `publicProcedure` for reads, `mutationProcedure` when it writes. A mutation with a side effect (a cache purge, a notification) must run it through `context.afterCommit(...)`, never inline — the handler runs inside an open transaction.
 
-**Fail open on optional infrastructure.** Redis, object storage and the queue are all optional, and every caller degrades rather than erroring. Keep it that way: a caching layer that can take the site down is worse than no caching layer.
+**Fail open on optional infrastructure.** Object storage is optional, and every caller degrades rather than erroring. Keep it that way for anything optional you add.
 
 **Never edit generated files.** `apps/web/src/routeTree.gen.ts` and `packages/db/src/migrations/*/snapshot.json` are outputs.
 

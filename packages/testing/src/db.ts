@@ -29,7 +29,7 @@ export const getTestDb = (): Database => {
 
 /**
  * Truncates every `public` table — drizzle's migration bookkeeping lives in its
- * own schema — plus pg-boss's jobs, which the `public`-only discovery misses.
+ * own schema.
  * Quoting goes through Postgres's own `format('%I', ...)` so reserved words
  * like `"user"` come out right.
  */

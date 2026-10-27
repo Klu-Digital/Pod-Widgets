@@ -244,14 +244,14 @@ describe("Dokploy adapter", () => {
   });
 
   it("reads existing variable names out of the environment text", async () => {
-    respond({ env: "DATABASE_URL=postgres://x\nREDIS_URL=redis://y\n" });
+    respond({ env: "DATABASE_URL=postgres://x\nS3_BUCKET=y\n" });
 
     const state = await createDokployClient(
       "https://dokploy.example.com",
       CANARY
     ).getApplication("app-1");
 
-    expect([...state.names].toSorted()).toEqual(["DATABASE_URL", "REDIS_URL"]);
+    expect([...state.names].toSorted()).toEqual(["DATABASE_URL", "S3_BUCKET"]);
   });
 
   it("appends to the existing environment instead of replacing it", async () => {
