@@ -1,4 +1,4 @@
-import type { EvlogVariables } from "@k22i/observability/hono";
+import type { EvlogVariables } from "@trumpet-pods/observability/hono";
 import { Hono } from "hono";
 import { describe, expect, it } from "vite-plus/test";
 

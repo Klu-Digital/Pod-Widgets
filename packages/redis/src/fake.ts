@@ -1,7 +1,7 @@
 /**
  * An in-memory ioredis stand-in, for unit tests that need cache or rate-limit
- * behaviour. Imports nothing from `@k22i/*`: it loads inside `vi.mock`
- * factories, where an `@k22i/env/shared-server` import would freeze `env` against
+ * behaviour. Imports nothing from `@trumpet-pods/*`: it loads inside `vi.mock`
+ * factories, where an `@trumpet-pods/env/shared-server` import would freeze `env` against
  * placeholders. Only the commands this repo issues.
  */
 
@@ -27,7 +27,7 @@ export interface FakeRedis {
     name: string,
     definition: { numberOfKeys: number; lua: string }
   ) => void;
-  k22iIncrementWithTtl?: (
+  trumpetPodsIncrementWithTtl?: (
     key: string,
     ttlSeconds: string | number
   ) => Promise<number>;
@@ -77,13 +77,13 @@ export const createFakeRedis = (
      * `redis.db.test.ts` is for.
      */
     defineCommand(name) {
-      if (name !== "k22iIncrementWithTtl") {
+      if (name !== "trumpetPodsIncrementWithTtl") {
         throw new Error(`fake-redis: unknown custom command "${name}"`);
       }
-      if (fake.k22iIncrementWithTtl) {
+      if (fake.trumpetPodsIncrementWithTtl) {
         return;
       }
-      fake.k22iIncrementWithTtl = async (key, ttlSeconds) => {
+      fake.trumpetPodsIncrementWithTtl = async (key, ttlSeconds) => {
         await guard();
         const count = await fake.incr(key);
         if (count === 1) {

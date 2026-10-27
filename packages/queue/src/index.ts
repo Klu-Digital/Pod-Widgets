@@ -1,5 +1,5 @@
-import { env } from "@k22i/env/shared-server";
-import { createError, log, parseError } from "@k22i/observability";
+import { env } from "@trumpet-pods/env/shared-server";
+import { createError, log, parseError } from "@trumpet-pods/observability";
 import { sql } from "drizzle-orm";
 import { fromDrizzle, PgBoss } from "pg-boss";
 import type {
@@ -22,7 +22,7 @@ const DEAD_LETTER_RETENTION_SECONDS = 30 * 24 * 60 * 60;
 // members like `cron` are not addressable. Widening is what makes it iterable.
 const jobEntries = Object.entries(jobs) as [JobName, JobDefinition][];
 
-/** Structurally typed by pg-boss, which keeps this package off `@k22i/db`. */
+/** Structurally typed by pg-boss, which keeps this package off `@trumpet-pods/db`. */
 type Transaction = DrizzleTransactionLike;
 
 type EnqueueOptions = Omit<SendOptions, "db"> & {
@@ -202,7 +202,7 @@ export const queue: QueueClient = createQueueClient();
 export const migrateQueueSchema = async (): Promise<void> => {
   const instance = new PgBoss({
     ...resolveQueueConfig("producer"),
-    application_name: "k22i-queue-migrate",
+    application_name: "trumpet-pods-queue-migrate",
     createSchema: true,
     max: 1,
     migrate: true,

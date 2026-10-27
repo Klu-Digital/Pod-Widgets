@@ -4,7 +4,7 @@ import {
   SidebarContent,
   SidebarHeader,
   SidebarRail,
-} from "@k22i/ui/components/sidebar";
+} from "@trumpet-pods/ui/components/sidebar";
 
 import NavMain from "@/components/nav-main";
 import type { NavItem } from "@/components/nav-main";

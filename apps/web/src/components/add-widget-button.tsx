@@ -1,10 +1,10 @@
-import { Button } from "@k22i/ui/components/button";
+import { Button } from "@trumpet-pods/ui/components/button";
 import {
   Menu,
   MenuItem,
   MenuPopup,
   MenuTrigger,
-} from "@k22i/ui/components/menu";
+} from "@trumpet-pods/ui/components/menu";
 
 export interface WidgetTypeOption {
   label: string;

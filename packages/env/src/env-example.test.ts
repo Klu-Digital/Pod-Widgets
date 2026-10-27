@@ -45,7 +45,7 @@ describe(".env.example coverage", () => {
     expect(documentedVars().size).toBeGreaterThan(20);
   });
 
-  it("documents every variable @k22i/env/server declares", () => {
+  it("documents every variable @trumpet-pods/env/server declares", () => {
     const documented = documentedVars();
 
     const undocumented = declaredServerVars().filter(

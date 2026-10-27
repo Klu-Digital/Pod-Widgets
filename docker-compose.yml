@@ -1,4 +1,4 @@
-name: k22i
+name: trumpet-pods
 
 services:
   web:
@@ -45,12 +45,12 @@ services:
     environment:
       PORT: ${SERVER_PORT:-1900}
       CORS_ORIGIN: http://localhost:${WEB_PORT:-2600}
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/k22i
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/trumpet-pods
       # Server -> bucket, over the compose network.
       S3_ENDPOINT: http://minio:9000
       # Host baked into presigned URLs; must be reachable from the browser, not from this container.
       S3_PUBLIC_ENDPOINT: http://localhost:${MINIO_PORT:-5300}
-      S3_BUCKET: ${S3_BUCKET:-k22i}
+      S3_BUCKET: ${S3_BUCKET:-trumpet-pods}
       S3_REGION: us-east-1
       S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
       S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
@@ -80,12 +80,12 @@ services:
       - path: apps/workers/.env
         required: false
     environment:
-      SERVICE_NAME: k22i-workers
+      SERVICE_NAME: trumpet-pods-workers
       WORKERS_PORT: ${WORKERS_PORT:-1901}
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/k22i
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/trumpet-pods
       # Import jobs read uploaded CSVs from the bucket over the compose network.
       S3_ENDPOINT: http://minio:9000
-      S3_BUCKET: ${S3_BUCKET:-k22i}
+      S3_BUCKET: ${S3_BUCKET:-trumpet-pods}
       S3_REGION: us-east-1
       S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
       S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
@@ -97,15 +97,15 @@ services:
 
   postgres:
     image: postgres:18@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722
-    container_name: k22i-postgres
+    container_name: trumpet-pods-postgres
     environment:
-      POSTGRES_DB: k22i
+      POSTGRES_DB: trumpet-pods
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
     ports:
       - "${POSTGRES_PORT:-4400}:5432"
     volumes:
-      - k22i_postgres_data:/var/lib/postgresql
+      - trumpet-pods_postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -115,7 +115,7 @@ services:
 
   redis:
     image: redis:8-alpine@sha256:3811787313eba226a2ef38658c6ccb91cd5e110edc89c37767de373120a0e5a0
-    container_name: k22i-redis
+    container_name: trumpet-pods-redis
     init: true
     # `--save 60 1` is one snapshot a minute if at least one key changed. Nothing
     # here is authoritative, so this exists only so a
@@ -126,7 +126,7 @@ services:
       # compose-network REDIS_URL on the server service is unaffected.
       - "${REDIS_PORT:-6666}:6379"
     volumes:
-      - k22i_redis_data:/data
+      - trumpet-pods_redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -136,7 +136,7 @@ services:
 
   minio:
     image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
-    container_name: k22i-minio
+    container_name: trumpet-pods-minio
     init: true
     command: server /data --console-address ":9001"
     environment:
@@ -150,7 +150,7 @@ services:
       - "${MINIO_PORT:-5300}:9000"
       - "${MINIO_CONSOLE_PORT:-5301}:9001"
     volumes:
-      - k22i_minio_data:/data
+      - trumpet-pods_minio_data:/data
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 10s
@@ -168,7 +168,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      S3_BUCKET: ${S3_BUCKET:-k22i}
+      S3_BUCKET: ${S3_BUCKET:-trumpet-pods}
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -179,6 +179,6 @@ services:
     restart: "no"
 
 volumes:
-  k22i_postgres_data:
-  k22i_minio_data:
-  k22i_redis_data:
+  trumpet-pods_postgres_data:
+  trumpet-pods_minio_data:
+  trumpet-pods_redis_data:

@@ -1,6 +1,6 @@
-import { env } from "@k22i/env/server";
-import { honoLogger } from "@k22i/observability/hono";
-import type { EvlogVariables } from "@k22i/observability/hono";
+import { env } from "@trumpet-pods/env/server";
+import { honoLogger } from "@trumpet-pods/observability/hono";
+import type { EvlogVariables } from "@trumpet-pods/observability/hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";

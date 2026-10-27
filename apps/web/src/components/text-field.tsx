@@ -1,6 +1,10 @@
-import { Field, FieldError, FieldLabel } from "@k22i/ui/components/field";
-import { Input } from "@k22i/ui/components/input";
-import type { InputProps } from "@k22i/ui/components/input";
+import {
+  Field,
+  FieldError,
+  FieldLabel,
+} from "@trumpet-pods/ui/components/field";
+import { Input } from "@trumpet-pods/ui/components/input";
+import type { InputProps } from "@trumpet-pods/ui/components/input";
 import { useId } from "react";
 import type { ReactNode } from "react";
 

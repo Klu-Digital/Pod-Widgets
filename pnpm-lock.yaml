@@ -120,10 +120,10 @@ importers:
 
   .:
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:packages/config
-      '@k22i/testing':
+      '@trumpet-pods/testing':
         specifier: workspace:*
         version: link:packages/testing
       '@shadcn/lint':
@@ -196,25 +196,25 @@ importers:
         specifier: 'catalog:'
         version: 4.6.5
     devDependencies:
-      '@k22i/api':
+      '@trumpet-pods/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@k22i/db':
+      '@trumpet-pods/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../../packages/env
-      '@k22i/observability':
+      '@trumpet-pods/observability':
         specifier: workspace:*
         version: link:../../packages/observability
-      '@k22i/queue':
+      '@trumpet-pods/queue':
         specifier: workspace:*
         version: link:../../packages/queue
-      '@k22i/redis':
+      '@trumpet-pods/redis':
         specifier: workspace:*
         version: link:../../packages/redis
       '@orpc/client':
@@ -247,13 +247,13 @@ importers:
       '@hugeicons/react':
         specifier: 'catalog:'
         version: 1.1.10(react@19.3.0)
-      '@k22i/api':
+      '@trumpet-pods/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../../packages/env
-      '@k22i/ui':
+      '@trumpet-pods/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@orpc/client':
@@ -281,7 +281,7 @@ importers:
         specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@tanstack/react-query-devtools':
@@ -354,22 +354,22 @@ importers:
         specifier: 'catalog:'
         version: 4.6.5
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@k22i/db':
+      '@trumpet-pods/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../../packages/env
-      '@k22i/observability':
+      '@trumpet-pods/observability':
         specifier: workspace:*
         version: link:../../packages/observability
-      '@k22i/queue':
+      '@trumpet-pods/queue':
         specifier: workspace:*
         version: link:../../packages/queue
-      '@k22i/testing':
+      '@trumpet-pods/testing':
         specifier: workspace:*
         version: link:../../packages/testing
       '@types/node':
@@ -393,19 +393,19 @@ importers:
 
   packages/api:
     dependencies:
-      '@k22i/db':
+      '@trumpet-pods/db':
         specifier: workspace:*
         version: link:../db
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../env
-      '@k22i/observability':
+      '@trumpet-pods/observability':
         specifier: workspace:*
         version: link:../observability
-      '@k22i/queue':
+      '@trumpet-pods/queue':
         specifier: workspace:*
         version: link:../queue
-      '@k22i/redis':
+      '@trumpet-pods/redis':
         specifier: workspace:*
         version: link:../redis
       '@orpc/server':
@@ -418,7 +418,7 @@ importers:
         specifier: 'catalog:'
         version: 4.6.5
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@typescript/native':
@@ -438,10 +438,10 @@ importers:
 
   packages/db:
     dependencies:
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../env
-      '@k22i/observability':
+      '@trumpet-pods/observability':
         specifier: workspace:*
         version: link:../observability
       dotenv:
@@ -460,7 +460,7 @@ importers:
       '@faker-js/faker':
         specifier: ^10.6.0
         version: 10.6.0
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@types/pg':
@@ -494,7 +494,7 @@ importers:
         specifier: 'catalog:'
         version: 4.6.5
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -512,14 +512,14 @@ importers:
 
   packages/observability:
     dependencies:
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../env
       evlog:
         specifier: 'catalog:'
         version: 2.30.0(@orpc/server@1.15.4(@opentelemetry/api@1.9.1)(ws@8.21.3))(express@5.2.1)(hono@4.13.13)(react@19.3.0)(vite@8.2.2(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@orpc/server':
@@ -537,10 +537,10 @@ importers:
 
   packages/queue:
     dependencies:
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../env
-      '@k22i/observability':
+      '@trumpet-pods/observability':
         specifier: workspace:*
         version: link:../observability
       dotenv:
@@ -556,7 +556,7 @@ importers:
         specifier: 'catalog:'
         version: 4.6.5
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@typescript/native':
@@ -574,17 +574,17 @@ importers:
 
   packages/redis:
     dependencies:
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../env
-      '@k22i/observability':
+      '@trumpet-pods/observability':
         specifier: workspace:*
         version: link:../observability
       ioredis:
         specifier: 'catalog:'
         version: 6.0.0
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@typescript/native':
@@ -605,14 +605,14 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: 'catalog:'
         version: 3.1146.0
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../env
-      '@k22i/observability':
+      '@trumpet-pods/observability':
         specifier: workspace:*
         version: link:../observability
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@typescript/native':
@@ -627,13 +627,13 @@ importers:
 
   packages/testing:
     dependencies:
-      '@k22i/db':
+      '@trumpet-pods/db':
         specifier: workspace:*
         version: link:../db
-      '@k22i/env':
+      '@trumpet-pods/env':
         specifier: workspace:*
         version: link:../env
-      '@k22i/queue':
+      '@trumpet-pods/queue':
         specifier: workspace:*
         version: link:../queue
       ioredis:
@@ -646,7 +646,7 @@ importers:
         specifier: 'catalog:'
         version: 12.37.0(@opentelemetry/api@1.9.1)
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@testcontainers/postgresql':
@@ -716,7 +716,7 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
     devDependencies:
-      '@k22i/config':
+      '@trumpet-pods/config':
         specifier: workspace:*
         version: link:../config
       '@tailwindcss/postcss':

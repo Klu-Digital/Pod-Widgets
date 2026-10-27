@@ -1,5 +1,5 @@
-import { Button } from "@k22i/ui/components/button";
 import { Link } from "@tanstack/react-router";
+import { Button } from "@trumpet-pods/ui/components/button";
 
 import { failureKind } from "@/utils/orpc";
 import type { FailureKind } from "@/utils/orpc";

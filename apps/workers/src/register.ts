@@ -1,6 +1,6 @@
-import { log } from "@k22i/observability";
-import { queue } from "@k22i/queue";
-import type { JobName, JobOf } from "@k22i/queue";
+import { log } from "@trumpet-pods/observability";
+import { queue } from "@trumpet-pods/queue";
+import type { JobName, JobOf } from "@trumpet-pods/queue";
 
 import { handleEcho, handleHeartbeat } from "./handlers/example";
 

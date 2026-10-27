@@ -1,7 +1,10 @@
-import { featureFlag } from "@k22i/db/schema/feature-flags";
-import { FEATURE_FLAG_NAMES, featureFlagRegistry } from "@k22i/env/flags";
-import { getTestDb } from "@k22i/testing";
 import { call, ORPCError } from "@orpc/server";
+import { featureFlag } from "@trumpet-pods/db/schema/feature-flags";
+import {
+  FEATURE_FLAG_NAMES,
+  featureFlagRegistry,
+} from "@trumpet-pods/env/flags";
+import { getTestDb } from "@trumpet-pods/testing";
 import { beforeEach, describe, expect, it } from "vite-plus/test";
 
 import type { Context } from "../context";

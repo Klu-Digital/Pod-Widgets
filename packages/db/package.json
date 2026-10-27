@@ -1,5 +1,5 @@
 {
-  "name": "@k22i/db",
+  "name": "@trumpet-pods/db",
   "type": "module",
   "exports": {
     ".": {
@@ -24,8 +24,8 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@k22i/env": "workspace:*",
-    "@k22i/observability": "workspace:*",
+    "@trumpet-pods/env": "workspace:*",
+    "@trumpet-pods/observability": "workspace:*",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "pg": "catalog:",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
-    "@k22i/config": "workspace:*",
+    "@trumpet-pods/config": "workspace:*",
     "@types/pg": "^8.23.1",
     "@typescript/native": "catalog:",
     "drizzle-kit": "catalog:",

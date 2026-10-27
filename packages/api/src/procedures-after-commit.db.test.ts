@@ -1,6 +1,6 @@
-import { featureFlag } from "@k22i/db/schema/feature-flags";
-import { getTestDb } from "@k22i/testing";
 import { call } from "@orpc/server";
+import { featureFlag } from "@trumpet-pods/db/schema/feature-flags";
+import { getTestDb } from "@trumpet-pods/testing";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vite-plus/test";
 

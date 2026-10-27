@@ -1,7 +1,7 @@
-import { db } from "@k22i/db";
-import { log, parseError } from "@k22i/observability";
-import type { EvlogVariables } from "@k22i/observability/hono";
-import { queue } from "@k22i/queue";
+import { db } from "@trumpet-pods/db";
+import { log, parseError } from "@trumpet-pods/observability";
+import type { EvlogVariables } from "@trumpet-pods/observability/hono";
+import { queue } from "@trumpet-pods/queue";
 import { sql } from "drizzle-orm";
 import type { Hono } from "hono";
 

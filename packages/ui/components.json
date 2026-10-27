@@ -12,11 +12,11 @@
   },
   "iconLibrary": "hugeicons",
   "aliases": {
-    "components": "@k22i/ui/components",
-    "utils": "@k22i/ui/lib/utils",
-    "hooks": "@k22i/ui/hooks",
-    "lib": "@k22i/ui/lib",
-    "ui": "@k22i/ui/components"
+    "components": "@trumpet-pods/ui/components",
+    "utils": "@trumpet-pods/ui/lib/utils",
+    "hooks": "@trumpet-pods/ui/hooks",
+    "lib": "@trumpet-pods/ui/lib",
+    "ui": "@trumpet-pods/ui/components"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

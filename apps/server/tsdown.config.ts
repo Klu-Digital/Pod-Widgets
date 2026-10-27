@@ -1,4 +1,4 @@
-import { scanPostMigrationFiles } from "@k22i/db/dev-scripts/post-migrate/discover";
+import { scanPostMigrationFiles } from "@trumpet-pods/db/dev-scripts/post-migrate/discover";
 import { defineConfig } from "tsdown";
 
 const POST_MIGRATIONS_ID = "virtual:post-migration-scripts";
@@ -19,7 +19,7 @@ const postMigrationScripts = {
     );
     return `${imports.join("\n")}\nexport default [${entries.join(", ")}];`;
   },
-  name: "k22i:post-migration-scripts",
+  name: "trumpet-pods:post-migration-scripts",
   resolveId(id: string) {
     return id === POST_MIGRATIONS_ID ? `\0${POST_MIGRATIONS_ID}` : null;
   },
@@ -28,7 +28,7 @@ const postMigrationScripts = {
 export default defineConfig({
   clean: true,
   deps: {
-    alwaysBundle: [/@k22i\/.*/u],
+    alwaysBundle: [/@trumpet-pods\/.*/u],
   },
   entry: {
     index: "./src/index.ts",

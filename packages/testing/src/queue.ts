@@ -1,10 +1,10 @@
-import { queue } from "@k22i/queue";
-import type { JobName, JobOf, JobPayload } from "@k22i/queue";
+import { queue } from "@trumpet-pods/queue";
+import type { JobName, JobOf, JobPayload } from "@trumpet-pods/queue";
 import type { JobWithMetadata } from "pg-boss";
 
 /**
  * Starts against this worker's own database — `setup/db.ts` has already
- * repointed `@k22i/env/server` at it. Must not be called from module scope.
+ * repointed `@trumpet-pods/env/server` at it. Must not be called from module scope.
  */
 export const startTestQueue = async (): Promise<void> => {
   await queue.start("producer");

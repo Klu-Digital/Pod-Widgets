@@ -34,7 +34,7 @@ const repoRoot = path.join(import.meta.dirname, "..", "..");
 const CANARY = "THIS_MUST_NEVER_APPEAR";
 
 const makeFixture = (): string => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "k22i-secrets-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "trumpet-pods-secrets-"));
   for (const app of ["server", "web", "workers"]) {
     const directory = path.join(root, "apps", app);
     mkdirSync(directory, { recursive: true });
@@ -522,6 +522,6 @@ describe("deployment check", () => {
 
     expect(rendered).not.toContain(CANARY);
     expect(rendered).not.toMatch(/DATABASE_URL=|PROMETHEUS_METRICS_TOKEN=/u);
-    expect(rendered).toContain("k22i staging");
+    expect(rendered).toContain("trumpet-pods staging");
   });
 });

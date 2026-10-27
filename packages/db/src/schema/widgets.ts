@@ -24,7 +24,7 @@ export type BannerVariant = (typeof bannerVariants)[number];
 export const widgetAuditActions = ["created", "deleted", "restored"] as const;
 export type WidgetAuditAction = (typeof widgetAuditActions)[number];
 
-/** Must stay equal to `EMPTY_DOC` in `@k22i/ui`; a drift saves a doc the editor rejects. */
+/** Must stay equal to `EMPTY_DOC` in `@trumpet-pods/ui`; a drift saves a doc the editor rejects. */
 export const emptyDoc = {
   content: [{ type: "paragraph" }],
   type: "doc",

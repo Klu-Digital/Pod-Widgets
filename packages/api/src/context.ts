@@ -1,5 +1,5 @@
-import { db } from "@k22i/db";
-import type { EvlogVariables } from "@k22i/observability/hono";
+import { db } from "@trumpet-pods/db";
+import type { EvlogVariables } from "@trumpet-pods/observability/hono";
 import type { Context as HonoContext } from "hono";
 
 export interface CreateContextOptions {

@@ -1,4 +1,4 @@
-import type { EvlogVariables } from "@k22i/observability/hono";
+import type { EvlogVariables } from "@trumpet-pods/observability/hono";
 import type { Hono, MiddlewareHandler } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 

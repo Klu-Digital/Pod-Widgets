@@ -1,5 +1,5 @@
-import { createDb } from "@k22i/db";
-import type { Database } from "@k22i/db";
+import { createDb } from "@trumpet-pods/db";
+import type { Database } from "@trumpet-pods/db";
 import { Pool } from "pg";
 
 let pool: Pool | undefined;

@@ -1,10 +1,11 @@
-import type * as TypeImport__k22i_env_server from "@k22i/env/server";
+import type * as TypeImport__trumpet_pods_env_server from "@trumpet-pods/env/server";
 import { Hono } from "hono";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 // One proxy in front, as with the web image's nginx alone.
-vi.mock("@k22i/env/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof TypeImport__k22i_env_server>();
+vi.mock("@trumpet-pods/env/server", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof TypeImport__trumpet_pods_env_server>();
   return { ...actual, env: { ...actual.env, TRUSTED_PROXY_HOPS: 1 } };
 });
 

@@ -59,7 +59,7 @@ export default async function setup(
   // Postgres 18 is mandatory: every id column defaults to `uuidv7()`, a native
   // PG18 function with no extension polyfill.
   const container = await new PostgreSqlContainer("postgres:18")
-    .withDatabase("k22i_template")
+    .withDatabase("trumpet-pods_template")
     // Per-run on purpose (no .withReuse()), pairing with the unconditional stop()
     // below. For reuse: TESTCONTAINERS_REUSE_ENABLE=true and a conditional teardown.
     .start();

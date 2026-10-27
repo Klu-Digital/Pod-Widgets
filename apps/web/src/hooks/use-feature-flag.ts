@@ -1,6 +1,6 @@
-import type { FeatureFlagName } from "@k22i/env/flags";
-import { FEATURE_FLAG_TTL_MS } from "@k22i/env/flags";
 import { useQuery } from "@tanstack/react-query";
+import type { FeatureFlagName } from "@trumpet-pods/env/flags";
+import { FEATURE_FLAG_TTL_MS } from "@trumpet-pods/env/flags";
 
 import { orpc } from "@/utils/orpc";
 

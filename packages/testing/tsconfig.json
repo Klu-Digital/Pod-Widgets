@@ -1,4 +1,4 @@
 {
-  "extends": "@k22i/config/tsconfig.base.json",
+  "extends": "@trumpet-pods/config/tsconfig.base.json",
   "include": ["src/**/*.ts"]
 }

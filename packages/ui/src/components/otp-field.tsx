@@ -1,8 +1,8 @@
 "use client";
 
 import { OTPField as OTPFieldPrimitive } from "@base-ui/react/otp-field";
-import { Separator } from "@k22i/ui/components/separator";
-import { cn } from "@k22i/ui/lib/utils";
+import { Separator } from "@trumpet-pods/ui/components/separator";
+import { cn } from "@trumpet-pods/ui/lib/utils";
 import type * as React from "react";
 
 export const OTPField = ({

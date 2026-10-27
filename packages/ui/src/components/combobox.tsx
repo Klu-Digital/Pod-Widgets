@@ -3,9 +3,9 @@
 import { Combobox as ComboboxPrimitive } from "@base-ui/react/combobox";
 import { UnfoldMoreIcon, XIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Input } from "@k22i/ui/components/input";
-import { ScrollArea } from "@k22i/ui/components/scroll-area";
-import { cn } from "@k22i/ui/lib/utils";
+import { Input } from "@trumpet-pods/ui/components/input";
+import { ScrollArea } from "@trumpet-pods/ui/components/scroll-area";
+import { cn } from "@trumpet-pods/ui/lib/utils";
 import * as React from "react";
 
 export const ComboboxContext: React.Context<{

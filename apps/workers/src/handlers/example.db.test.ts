@@ -1,10 +1,10 @@
-import { queue } from "@k22i/queue";
+import { queue } from "@trumpet-pods/queue";
 import {
   drainQueue,
   getJobs,
   startTestQueue,
   stopTestQueue,
-} from "@k22i/testing";
+} from "@trumpet-pods/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test";
 
 import { handleEcho } from "./example";

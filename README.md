@@ -1,4 +1,4 @@
-# k22i
+# trumpet-pods
 
 This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, ORPC, and more.
 
@@ -132,7 +132,7 @@ npx shadcn@latest add @coss/ui --overwrite -c packages/ui
 Import shared components like this:
 
 ```tsx
-import { Button } from "@k22i/ui/components/button";
+import { Button } from "@trumpet-pods/ui/components/button";
 ```
 
 ### Page titles and breadcrumbs
@@ -168,7 +168,7 @@ Things that bite:
 - **`loader` has to be written above `head`.** TypeScript resolves the route options object in source order, and with `head` first it has not yet inferred what the loader returns, so `loaderData` widens to `never` and every property access on it fails to compile. This is the one place in the codebase where route options are deliberately not key-sorted — a dynamic route carries an `/* oxlint-disable sort-keys */` for it.
 - **Always give the fallback a sensible label.** An id that resolves to nothing still renders a crumb; `loaderData?.name ?? "Report"` is the difference between a generic trail and one reading "undefined".
 - **The loader is what makes the crumb possible, not an extra request.** `ensureQueryData` seeds the same cache entry the component's `useQuery` reads, so the page costs one fetch. The real trade is timing: navigation now waits for the record before it paints rather than flashing a skeleton, which is deliberate — a breadcrumb that arrives a beat after the page is a layout shift in the header.
-- **The root route's title is the product name, not a crumb.** `__root.tsx` sets `title: "k22i"` as the fallback tab title; `AppBreadcrumbs` skips the root match so it never appears in the trail. Every child title overrides it in the tab.
+- **The root route's title is the product name, not a crumb.** `__root.tsx` sets `title: "trumpet-pods"` as the fallback tab title; `AppBreadcrumbs` skips the root match so it never appears in the trail. Every child title overrides it in the tab.
 - **`staticData.crumb` is gone.** It could not express a dynamic crumb, and keeping both would mean two places to name a screen.
 
 ### Add app-specific blocks
@@ -293,12 +293,12 @@ pnpm run redis:start
 The host port is **6666**, not Redis's default 6379 — the container-internal port is still 6379, which is why the compose-network `REDIS_URL` on the `server` service reads `redis://redis:6379`. Poke around a running instance with:
 
 ```bash
-docker exec -it k22i-redis redis-cli
+docker exec -it trumpet-pods-redis redis-cli
 ```
 
 ### Cache
 
-`createCache(namespace)` from `@k22i/redis` returns `get` / `set` / `del` / `remember`, all namespaced under `${namespace}:`:
+`createCache(namespace)` from `@trumpet-pods/redis` returns `get` / `set` / `del` / `remember`, all namespaced under `${namespace}:`:
 
 ```ts
 const orgCache = createCache("org");
@@ -343,10 +343,10 @@ In a web component:
 const showExample = useFeatureFlag("FF__EXAMPLE");
 ```
 
-On the server, read through the resolver in `@k22i/api/feature-flags` — it needs a `db` because the value lives in a table, and it is cached per process so this is a map lookup on all but one call in thirty:
+On the server, read through the resolver in `@trumpet-pods/api/feature-flags` — it needs a `db` because the value lives in a table, and it is cached per process so this is a map lookup on all but one call in thirty:
 
 ```ts
-import { isFeatureEnabled } from "@k22i/api/feature-flags";
+import { isFeatureEnabled } from "@trumpet-pods/api/feature-flags";
 
 if (await isFeatureEnabled(context.db, "FF__EXAMPLE")) {
   /* ... */
@@ -380,7 +380,7 @@ Things to know:
 ## Project Structure
 
 ```
-k22i/
+trumpet-pods/
 ├── apps/
 │   ├── web/         # Frontend application (React + TanStack Router)
 │   ├── server/      # Backend API (Hono, ORPC)

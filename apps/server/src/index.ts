@@ -3,17 +3,17 @@ import { promisify } from "node:util";
 
 import { serve } from "@hono/node-server";
 import type { ServerType } from "@hono/node-server";
-import { env } from "@k22i/env/server";
+import { env } from "@trumpet-pods/env/server";
 // Initializes the logger at module scope, so it must come before ./app, which
-// pulls in @k22i/db. Keep this import first.
+// pulls in @trumpet-pods/db. Keep this import first.
 import {
   exitOnCrash,
   log,
   observability,
   parseError,
-} from "@k22i/observability";
-import { queue } from "@k22i/queue";
-import { redis } from "@k22i/redis";
+} from "@trumpet-pods/observability";
+import { queue } from "@trumpet-pods/queue";
+import { redis } from "@trumpet-pods/redis";
 
 import { createApp } from "./app";
 

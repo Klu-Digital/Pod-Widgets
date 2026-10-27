@@ -1,7 +1,7 @@
 import { isIP } from "node:net";
 
 import { getConnInfo } from "@hono/node-server/conninfo";
-import { env } from "@k22i/env/server";
+import { env } from "@trumpet-pods/env/server";
 import type { Context } from "hono";
 
 // Each proxy appends the address it saw, so only the last `hops` entries were

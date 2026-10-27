@@ -1,11 +1,12 @@
 import { ChevronRightIcon } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@k22i/ui/components/collapsible";
+} from "@trumpet-pods/ui/components/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -15,8 +16,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@k22i/ui/components/sidebar";
-import { Link, useMatchRoute } from "@tanstack/react-router";
+} from "@trumpet-pods/ui/components/sidebar";
 
 import type { FileRoutesByTo } from "@/routeTree.gen";
 

@@ -1,11 +1,11 @@
-import { queue } from "@k22i/queue";
+import { call } from "@orpc/server";
+import { queue } from "@trumpet-pods/queue";
 import {
   getQueuedJobs,
   getTestDb,
   startTestQueue,
   stopTestQueue,
-} from "@k22i/testing";
-import { call } from "@orpc/server";
+} from "@trumpet-pods/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test";
 
 import type { Context } from "../context";

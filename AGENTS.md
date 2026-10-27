@@ -1,6 +1,6 @@
 # AGENTS.md
 
-A fullstack TypeScript template: React/TanStack Router web, Hono + oRPC API, background workers, Postgres/Drizzle. There is no auth: the app is public and single-tenant. pnpm workspace, `@k22i/*` package scope. `pnpm rename <new-name>` rewrites the scope, the Compose project and the database for a new project. It sends no email. The reasoning behind the decisions that surprise people is in [docs/adr/](docs/adr/).
+A fullstack TypeScript template: React/TanStack Router web, Hono + oRPC API, background workers, Postgres/Drizzle. There is no auth: the app is public and single-tenant. pnpm workspace, `@trumpet-pods/*` package scope. `pnpm rename <new-name>` rewrites the scope, the Compose project and the database for a new project. It sends no email. The reasoning behind the decisions that surprise people is in [docs/adr/](docs/adr/).
 
 ## Layout
 
@@ -45,7 +45,7 @@ The filename routes the test. Three vitest projects:
 
 Run one file: `pnpm exec vp test run --project unit path/to/file.test.ts`.
 
-`@k22i/env/server` freezes its config at import, so `vi.stubEnv` does not work on it. Mock the module instead — `apps/server/src/metrics.test.ts` is the pattern.
+`@trumpet-pods/env/server` freezes its config at import, so `vi.stubEnv` does not work on it. Mock the module instead — `apps/server/src/metrics.test.ts` is the pattern.
 
 ## Invariants worth knowing before editing
 
@@ -53,7 +53,7 @@ These are the ones that cost real time to rediscover. The README carries the ful
 
 **Cache invalidation inside a mutation must go through `context.afterCommit()`.** `mutationProcedure` wraps handlers in `db.transaction(...)`, so a `cache.del()` called inline purges a key the transaction may still roll back. The `.use(afterCommit).use(transaction)` order in `packages/api/src/procedures.ts` is load-bearing — reversing it silently reintroduces the bug.
 
-**Optional infrastructure degrades, but security limits never vanish.** Redis, storage and the queue all degrade rather than erroring — with `REDIS_URL` unset the server boots normally and the cache becomes a pass-through. Rate limits are the exception to failing open: count through `countHit` from `@k22i/redis`, which falls back to an in-process window (per process, so looser across replicas) rather than letting everything through ([ADR 0004](docs/adr/0004-fail-closed-security-limits.md)). Preserve both when adding callers.
+**Optional infrastructure degrades, but security limits never vanish.** Redis, storage and the queue all degrade rather than erroring — with `REDIS_URL` unset the server boots normally and the cache becomes a pass-through. Rate limits are the exception to failing open: count through `countHit` from `@trumpet-pods/redis`, which falls back to an in-process window (per process, so looser across replicas) rather than letting everything through ([ADR 0004](docs/adr/0004-fail-closed-security-limits.md)). Preserve both when adding callers.
 
 **apps/server enqueues, apps/workers runs.** Cron and queue maintenance belong to workers so nothing competes with the request path. `queue.start()` is fatal in workers and deliberately non-fatal in the server.
 
@@ -77,9 +77,9 @@ These are the ones that cost real time to rediscover. The README carries the ful
 
 **Web errors toast once, from the `QueryClient`.** `apps/web/src/utils/orpc.ts` toasts failed queries and mutations through `errorMessage`, which shows only defined errors' messages; a screen that shows the failure inline sets `meta: { suppressErrorToast: true }` instead of its own `onError`. Defined errors are never retried. Type procedure results with `RouterOutputs`, not `typeof client`; component tests mock `@/utils/client`.
 
-**Logging.** Reach for `log` from `@k22i/observability`, never `console`. Every call carries an `action` — a dotted, snake_cased event name that is the thing you will later grep and alert on (`redis.error`, `queue.start_failed`, `featureflags.read.failed`). Spread `parseError(error)` into the payload rather than stringifying the error yourself.
+**Logging.** Reach for `log` from `@trumpet-pods/observability`, never `console`. Every call carries an `action` — a dotted, snake_cased event name that is the thing you will later grep and alert on (`redis.error`, `queue.start_failed`, `featureflags.read.failed`). Spread `parseError(error)` into the payload rather than stringifying the error yourself.
 
-**Styling.** The `shadcn/*` oxlint rules are errors in app code: no raw colors, no inline styles, no arbitrary values, no unknown classes, and class names must be static strings (no `` `text-${tone}-500` ``). Colors come from the theme in `packages/ui/src/styles/globals.css`. `layout` is the one allowed arbitrary-value escape. One exemption is configured deliberately in `oxlint.config.ts`: `packages/ui/src/**` may style itself because it _is_ the design system. Import primitives as `@k22i/ui/components/button`; add more with `npx shadcn@latest add @coss/<name> -c packages/ui`.
+**Styling.** The `shadcn/*` oxlint rules are errors in app code: no raw colors, no inline styles, no arbitrary values, no unknown classes, and class names must be static strings (no `` `text-${tone}-500` ``). Colors come from the theme in `packages/ui/src/styles/globals.css`. `layout` is the one allowed arbitrary-value escape. One exemption is configured deliberately in `oxlint.config.ts`: `packages/ui/src/**` may style itself because it _is_ the design system. Import primitives as `@trumpet-pods/ui/components/button`; add more with `npx shadcn@latest add @coss/<name> -c packages/ui`.
 
 **Lint deltas from the Ultracite preset.** `no-await-in-loop` is off — plenty of loops here are deliberately sequential (ordered migrations, retry backoff, cursor walks) and the rule's suggested fix is a bug. `react/no-unstable-nested-components` allows render props. Everything else is the preset, and `pnpm fix` autofixes most of it.
 

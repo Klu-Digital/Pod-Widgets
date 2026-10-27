@@ -1,5 +1,5 @@
 {
-  "name": "@k22i/queue",
+  "name": "@trumpet-pods/queue",
   "type": "module",
   "exports": {
     ".": {
@@ -14,15 +14,15 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@k22i/env": "workspace:*",
-    "@k22i/observability": "workspace:*",
+    "@trumpet-pods/env": "workspace:*",
+    "@trumpet-pods/observability": "workspace:*",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "pg-boss": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@k22i/config": "workspace:*",
+    "@trumpet-pods/config": "workspace:*",
     "@typescript/native": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",

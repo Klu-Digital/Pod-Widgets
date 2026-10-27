@@ -20,12 +20,12 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@k22i/config": "workspace:*",
-    "@k22i/db": "workspace:*",
-    "@k22i/env": "workspace:*",
-    "@k22i/observability": "workspace:*",
-    "@k22i/queue": "workspace:*",
-    "@k22i/testing": "workspace:*",
+    "@trumpet-pods/config": "workspace:*",
+    "@trumpet-pods/db": "workspace:*",
+    "@trumpet-pods/env": "workspace:*",
+    "@trumpet-pods/observability": "workspace:*",
+    "@trumpet-pods/queue": "workspace:*",
+    "@trumpet-pods/testing": "workspace:*",
     "@types/node": "catalog:",
     "@typescript/native": "catalog:",
     "tsdown": "catalog:",

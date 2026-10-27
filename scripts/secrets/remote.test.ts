@@ -210,10 +210,10 @@ describe("Dokploy adapter", () => {
     respond([
       {
         applications: [
-          { applicationId: "srv-1", name: "k22i-server" },
-          { applicationId: "wrk-1", name: "k22i-workers" },
+          { applicationId: "srv-1", name: "trumpet-pods-server" },
+          { applicationId: "wrk-1", name: "trumpet-pods-workers" },
         ],
-        name: "k22i",
+        name: "trumpet-pods",
       },
     ]);
 
@@ -223,8 +223,8 @@ describe("Dokploy adapter", () => {
     ).listApplications();
 
     expect(discovered).toEqual([
-      { applicationId: "srv-1", label: "k22i / k22i-server" },
-      { applicationId: "wrk-1", label: "k22i / k22i-workers" },
+      { applicationId: "srv-1", label: "trumpet-pods / trumpet-pods-server" },
+      { applicationId: "wrk-1", label: "trumpet-pods / trumpet-pods-workers" },
     ]);
   });
 

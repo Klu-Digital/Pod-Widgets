@@ -5,11 +5,11 @@
 // oxlint-disable jsx-a11y/prefer-tag-over-role
 // oxlint-disable jsx-a11y/no-static-element-interactions
 
-import { Input } from "@k22i/ui/components/input";
-import type { InputProps } from "@k22i/ui/components/input";
-import { Textarea } from "@k22i/ui/components/textarea";
-import type { TextareaProps } from "@k22i/ui/components/textarea";
-import { cn } from "@k22i/ui/lib/utils";
+import { Input } from "@trumpet-pods/ui/components/input";
+import type { InputProps } from "@trumpet-pods/ui/components/input";
+import { Textarea } from "@trumpet-pods/ui/components/textarea";
+import type { TextareaProps } from "@trumpet-pods/ui/components/textarea";
+import { cn } from "@trumpet-pods/ui/lib/utils";
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 import type * as React from "react";

@@ -1,6 +1,6 @@
-import type { FeatureFlagName } from "@k22i/env/flags";
-import { orpcLogger } from "@k22i/observability/orpc";
 import { ORPCError, os } from "@orpc/server";
+import type { FeatureFlagName } from "@trumpet-pods/env/flags";
+import { orpcLogger } from "@trumpet-pods/observability/orpc";
 
 import type { Context } from "./context";
 import { isFeatureEnabled } from "./feature-flags/feature-flags.cache";

@@ -1,8 +1,8 @@
-import type { AppRouterClient } from "@k22i/api/routers/index";
-import { env } from "@k22i/env/web";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { SimpleCsrfProtectionLinkPlugin } from "@orpc/client/plugins";
+import type { AppRouterClient } from "@trumpet-pods/api/routers/index";
+import { env } from "@trumpet-pods/env/web";
 
 import { getServerUrl } from "@/lib/server-url";
 

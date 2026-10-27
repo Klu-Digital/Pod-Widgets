@@ -1,6 +1,6 @@
-import { resetLocalRateLimits } from "@k22i/redis";
-import { createFakeRedis } from "@k22i/redis/fake";
 import { call, ORPCError, os } from "@orpc/server";
+import { resetLocalRateLimits } from "@trumpet-pods/redis";
+import { createFakeRedis } from "@trumpet-pods/redis/fake";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import type { Context } from "./context";
@@ -16,7 +16,7 @@ const caught = async (p: Promise<unknown>): Promise<unknown> => {
 
 const redisMock = vi.hoisted(() => ({ client: vi.fn() }));
 
-vi.mock("@k22i/redis/client", () => ({
+vi.mock("@trumpet-pods/redis/client", () => ({
   redis: { client: redisMock.client, isConfigured: () => true },
 }));
 

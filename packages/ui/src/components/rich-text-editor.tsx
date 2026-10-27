@@ -7,13 +7,13 @@ import {
   TextItalicIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Toggle } from "@k22i/ui/components/toggle";
-import { cn } from "@k22i/ui/lib/utils";
 import type { JSONContent } from "@tiptap/core";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
+import { Toggle } from "@trumpet-pods/ui/components/toggle";
+import { cn } from "@trumpet-pods/ui/lib/utils";
 import type React from "react";
 
 /** Plain ProseMirror JSON, so consumers need no Tiptap import to store it. */

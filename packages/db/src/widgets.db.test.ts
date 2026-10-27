@@ -1,4 +1,4 @@
-import { getTestDb } from "@k22i/testing/db";
+import { getTestDb } from "@trumpet-pods/testing/db";
 import { describe, expect, it } from "vite-plus/test";
 
 import { page } from "./schema/pages";

@@ -1,5 +1,5 @@
 {
-  "name": "@k22i/observability",
+  "name": "@trumpet-pods/observability",
   "type": "module",
   "exports": {
     ".": {
@@ -13,12 +13,12 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@k22i/env": "workspace:*",
+    "@trumpet-pods/env": "workspace:*",
     "evlog": "catalog:"
   },
   "devDependencies": {
-    "@k22i/config": "workspace:*",
     "@orpc/server": "catalog:",
+    "@trumpet-pods/config": "workspace:*",
     "@typescript/native": "catalog:",
     "hono": "catalog:",
     "typescript": "catalog:"

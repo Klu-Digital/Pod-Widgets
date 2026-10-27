@@ -72,7 +72,7 @@ export default defineConfig({
       },
       {
         // Vitest 5's `test.env` reaches `process.env` but not `import.meta.env`,
-        // which is what `@k22i/env/web` reads; without this the suite only
+        // which is what `@trumpet-pods/env/web` reads; without this the suite only
         // passes on a machine that has an apps/web/.env. "/" is the deployed
         // value, so the tests exercise the same same-origin resolution path
         // production does.

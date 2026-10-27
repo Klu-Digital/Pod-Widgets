@@ -1,3 +1,4 @@
+import { Link, rootRouteId, useMatches } from "@tanstack/react-router";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -5,8 +6,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@k22i/ui/components/breadcrumb";
-import { Link, rootRouteId, useMatches } from "@tanstack/react-router";
+} from "@trumpet-pods/ui/components/breadcrumb";
 import { Fragment } from "react";
 
 /**

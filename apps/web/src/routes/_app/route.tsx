@@ -1,10 +1,10 @@
-import { Separator } from "@k22i/ui/components/separator";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Separator } from "@trumpet-pods/ui/components/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@k22i/ui/components/sidebar";
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+} from "@trumpet-pods/ui/components/sidebar";
 
 import AppBreadcrumbs from "@/components/app-breadcrumbs";
 import AppSidebar from "@/components/app-sidebar";

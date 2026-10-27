@@ -1,6 +1,6 @@
-import { db } from "@k22i/db";
-import { log, parseError } from "@k22i/observability";
-import { queue } from "@k22i/queue";
+import { db } from "@trumpet-pods/db";
+import { log, parseError } from "@trumpet-pods/observability";
+import { queue } from "@trumpet-pods/queue";
 import { sql } from "drizzle-orm";
 import { Hono } from "hono";
 

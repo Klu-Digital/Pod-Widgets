@@ -1,5 +1,3 @@
-import type { AppRouterClient } from "@k22i/api/routers/index";
-import { toastManager } from "@k22i/ui/components/toast";
 import { ORPCError, isDefinedError } from "@orpc/client";
 import type {
   InferClientErrorUnion,
@@ -8,6 +6,8 @@ import type {
 } from "@orpc/client";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
+import type { AppRouterClient } from "@trumpet-pods/api/routers/index";
+import { toastManager } from "@trumpet-pods/ui/components/toast";
 
 import { client } from "@/utils/client";
 

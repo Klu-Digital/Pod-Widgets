@@ -1,5 +1,5 @@
 {
-  "name": "@k22i/storage",
+  "name": "@trumpet-pods/storage",
   "type": "module",
   "exports": {
     ".": {
@@ -15,11 +15,11 @@
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",
     "@aws-sdk/s3-request-presigner": "catalog:",
-    "@k22i/env": "workspace:*",
-    "@k22i/observability": "workspace:*"
+    "@trumpet-pods/env": "workspace:*",
+    "@trumpet-pods/observability": "workspace:*"
   },
   "devDependencies": {
-    "@k22i/config": "workspace:*",
+    "@trumpet-pods/config": "workspace:*",
     "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"

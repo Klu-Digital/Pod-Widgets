@@ -6,17 +6,17 @@
 // columns, never rename or drop in the release that stops using something.
 import path from "node:path";
 
-// Must load before @k22i/db, hence the dynamic imports below.
-import { log, observability, parseError } from "@k22i/observability";
-import { migrateQueueSchema } from "@k22i/queue";
+// Must load before @trumpet-pods/db, hence the dynamic imports below.
+import { log, observability, parseError } from "@trumpet-pods/observability";
+import { migrateQueueSchema } from "@trumpet-pods/queue";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import postMigrationScripts from "virtual:post-migration-scripts";
 
 const migrationsFolder = path.resolve(import.meta.dirname, "../migrations");
 
-const { createDb, createPool } = await import("@k22i/db");
+const { createDb, createPool } = await import("@trumpet-pods/db");
 const { runPostMigrations } =
-  await import("@k22i/db/dev-scripts/post-migrate/runner");
+  await import("@trumpet-pods/db/dev-scripts/post-migrate/runner");
 
 try {
   const pool = createPool({ max: 1 });

@@ -1,7 +1,7 @@
 import type { IconSvgElement } from "@hugeicons/react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@k22i/ui/components/button";
-import type { ButtonProps } from "@k22i/ui/components/button";
+import { Button } from "@trumpet-pods/ui/components/button";
+import type { ButtonProps } from "@trumpet-pods/ui/components/button";
 
 export const IconButton = ({
   "aria-label": ariaLabel,

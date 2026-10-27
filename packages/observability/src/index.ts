@@ -1,6 +1,6 @@
 import { setTimeout as sleep } from "node:timers/promises";
 
-import { env } from "@k22i/env/shared-server";
+import { env } from "@trumpet-pods/env/shared-server";
 import { initLogger, log, parseError } from "evlog";
 
 import { createDrain } from "./drain";

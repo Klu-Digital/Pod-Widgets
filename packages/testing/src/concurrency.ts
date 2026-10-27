@@ -1,6 +1,6 @@
 import { setTimeout as sleep } from "node:timers/promises";
 
-import type { Database } from "@k22i/db";
+import type { Database } from "@trumpet-pods/db";
 
 import { getTestPool } from "./db";
 

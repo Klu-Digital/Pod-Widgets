@@ -1,5 +1,5 @@
 {
-  "extends": "@k22i/config/tsconfig.base.json",
+  "extends": "@trumpet-pods/config/tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
@@ -7,7 +7,7 @@
     "rootDirs": ["."],
     "paths": {
       "@/*": ["./src/*"],
-      "@k22i/ui/*": ["../../packages/ui/src/*"]
+      "@trumpet-pods/ui/*": ["../../packages/ui/src/*"]
     }
   }
 }

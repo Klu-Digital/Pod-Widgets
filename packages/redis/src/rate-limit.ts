@@ -1,4 +1,4 @@
-import { log } from "@k22i/observability";
+import { log } from "@trumpet-pods/observability";
 
 import { redis } from "./client";
 import { incrementWithTtl } from "./increment";

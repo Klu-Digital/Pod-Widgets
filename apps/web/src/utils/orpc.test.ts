@@ -1,5 +1,5 @@
-import { toastManager } from "@k22i/ui/components/toast";
 import { ORPCError } from "@orpc/client";
+import { toastManager } from "@trumpet-pods/ui/components/toast";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import {
@@ -9,7 +9,7 @@ import {
   orNullIfMissing,
 } from "@/utils/orpc";
 
-vi.mock("@k22i/ui/components/toast", () => ({
+vi.mock("@trumpet-pods/ui/components/toast", () => ({
   toastManager: {
     add: vi.fn(),
     close: vi.fn(),

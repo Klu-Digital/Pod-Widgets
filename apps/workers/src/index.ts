@@ -1,14 +1,14 @@
 import { serve } from "@hono/node-server";
-import { env } from "@k22i/env/workers";
+import { env } from "@trumpet-pods/env/workers";
 // Initializes the logger at module scope, so it must come before anything
-// pulling in @k22i/db or @k22i/queue. Keep this import first.
+// pulling in @trumpet-pods/db or @trumpet-pods/queue. Keep this import first.
 import {
   exitOnCrash,
   log,
   observability,
   parseError,
-} from "@k22i/observability";
-import { queue } from "@k22i/queue";
+} from "@trumpet-pods/observability";
+import { queue } from "@trumpet-pods/queue";
 
 import { createApp } from "./app";
 import { registerWorkers } from "./register";

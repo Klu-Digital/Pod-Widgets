@@ -1,6 +1,6 @@
 import { prometheus } from "@hono/prometheus";
-import { env } from "@k22i/env/server";
-import type { EvlogVariables } from "@k22i/observability/hono";
+import { env } from "@trumpet-pods/env/server";
+import type { EvlogVariables } from "@trumpet-pods/observability/hono";
 import type { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 

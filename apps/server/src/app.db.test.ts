@@ -1,8 +1,8 @@
-import type { AppRouterClient } from "@k22i/api/routers/index";
-import type { EvlogVariables } from "@k22i/observability/hono";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { SimpleCsrfProtectionLinkPlugin } from "@orpc/client/plugins";
+import type { AppRouterClient } from "@trumpet-pods/api/routers/index";
+import type { EvlogVariables } from "@trumpet-pods/observability/hono";
 import { Hono } from "hono";
 import { describe, expect, it } from "vite-plus/test";
 

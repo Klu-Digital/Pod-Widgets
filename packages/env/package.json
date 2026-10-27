@@ -1,5 +1,5 @@
 {
-  "name": "@k22i/env",
+  "name": "@trumpet-pods/env",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -19,7 +19,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@k22i/config": "workspace:*",
+    "@trumpet-pods/config": "workspace:*",
     "@types/node": "catalog:",
     "@typescript/native": "catalog:",
     "typescript": "catalog:",

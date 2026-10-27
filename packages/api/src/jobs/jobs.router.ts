@@ -1,4 +1,4 @@
-import { queue } from "@k22i/queue";
+import { queue } from "@trumpet-pods/queue";
 import { z } from "zod";
 
 import { mutationProcedure } from "../procedures";

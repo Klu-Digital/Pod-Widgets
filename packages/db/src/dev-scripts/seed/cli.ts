@@ -45,7 +45,7 @@ const main = async (): Promise<void> => {
     return;
   }
 
-  const { env } = await import("@k22i/env/shared-server");
+  const { env } = await import("@trumpet-pods/env/shared-server");
   if (env.NODE_ENV === "production") {
     console.error(
       'Refusing to seed: NODE_ENV is "production". This tool has no production use case.'

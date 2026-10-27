@@ -4,7 +4,7 @@ status: superseded
 
 Superseded for this project by #8 (auth removed).
 
-# k22i sends no email; recovery is admin-driven
+# trumpet-pods sends no email; recovery is admin-driven
 
 A project started from this template is often self-hosted, so there is no mail server to assume and no `EMAIL_*` configuration to ask every operator for. Password recovery, email verification and invitations therefore never depend on delivering a message. The person running the server, with shell access, is the root of trust — the same pattern Immich, Nextcloud, Gitea and Vaultwarden use.
 

@@ -2,10 +2,10 @@
 
 import type { Toggle as TogglePrimitive } from "@base-ui/react/toggle";
 import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group";
-import { Separator } from "@k22i/ui/components/separator";
-import { Toggle as ToggleComponent } from "@k22i/ui/components/toggle";
-import type { toggleVariants } from "@k22i/ui/components/toggle";
-import { cn } from "@k22i/ui/lib/utils";
+import { Separator } from "@trumpet-pods/ui/components/separator";
+import { Toggle as ToggleComponent } from "@trumpet-pods/ui/components/toggle";
+import type { toggleVariants } from "@trumpet-pods/ui/components/toggle";
+import { cn } from "@trumpet-pods/ui/lib/utils";
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 

@@ -1,9 +1,9 @@
+import { act, render, screen } from "@testing-library/react";
 import {
   EMPTY_DOC,
   RichTextEditor,
-} from "@k22i/ui/components/rich-text-editor";
-import type { RichTextDoc } from "@k22i/ui/components/rich-text-editor";
-import { act, render, screen } from "@testing-library/react";
+} from "@trumpet-pods/ui/components/rich-text-editor";
+import type { RichTextDoc } from "@trumpet-pods/ui/components/rich-text-editor";
 import { expect, it, vi } from "vite-plus/test";
 
 interface MountedEditor {

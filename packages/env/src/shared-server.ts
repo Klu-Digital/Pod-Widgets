@@ -34,7 +34,7 @@ export const sharedServerVariables = {
   S3_REGION: z.string().min(1).default("auto"),
   S3_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   /** Tags every log line, so a shared drain can distinguish processes. */
-  SERVICE_NAME: z.string().min(1).default("k22i-server"),
+  SERVICE_NAME: z.string().min(1).default("trumpet-pods-server"),
   STORAGE_MAX_UPLOAD_BYTES: z.coerce
     .number()
     .int()

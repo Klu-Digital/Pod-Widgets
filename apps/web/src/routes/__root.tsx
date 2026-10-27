@@ -1,5 +1,3 @@
-import { Button } from "@k22i/ui/components/button";
-import { ToastProvider } from "@k22i/ui/components/toast";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
@@ -8,6 +6,8 @@ import {
   createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Button } from "@trumpet-pods/ui/components/button";
+import { ToastProvider } from "@trumpet-pods/ui/components/toast";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import type { orpc } from "@/utils/orpc";
@@ -63,10 +63,10 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
     ],
     meta: [
       {
-        title: "k22i",
+        title: "trumpet-pods",
       },
       {
-        content: "k22i is a web application",
+        content: "trumpet-pods is a web application",
         name: "description",
       },
     ],

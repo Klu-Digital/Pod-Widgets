@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/pnpm-store pnpm install --frozen-lockfile --store
 
 RUN cd apps/server && SKIP_ENV_VALIDATION=1 NODE_ENV=production pnpm run build
 
-# Production dependencies and the bundle only. `@k22i/*` are devDependencies
+# Production dependencies and the bundle only. `@trumpet-pods/*` are devDependencies
 # because tsdown inlines them; as dependencies they would drag their own deps
 # (drizzle-kit) in here. pnpm 10 deploys a workspace package only when workspace
 # packages are injected; enabling that just for this command leaves local dev

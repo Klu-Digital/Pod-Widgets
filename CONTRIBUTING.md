@@ -53,7 +53,7 @@ pnpm test:watch
 
 `db` tests get a real Postgres via testcontainers, migrated once per run, and each worker gets its own numbered Redis logical database that is flushed between tests. Point the suite at a Redis you care about and it will erase it.
 
-Reach for a `.db.test.ts` when the thing under test is the SQL or the transaction boundary. Everything else is cheaper and faster as a unit test — see `apps/server/src/metrics.test.ts` for the module-mocking pattern that gets around `@k22i/env/server` freezing its config at import.
+Reach for a `.db.test.ts` when the thing under test is the SQL or the transaction boundary. Everything else is cheaper and faster as a unit test — see `apps/server/src/metrics.test.ts` for the module-mocking pattern that gets around `@trumpet-pods/env/server` freezing its config at import.
 
 ## Database changes
 

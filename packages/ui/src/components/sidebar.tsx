@@ -4,25 +4,25 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { PanelLeftIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "@k22i/ui/components/button";
-import { Input } from "@k22i/ui/components/input";
-import { ScrollArea } from "@k22i/ui/components/scroll-area";
-import { Separator } from "@k22i/ui/components/separator";
+import { Button } from "@trumpet-pods/ui/components/button";
+import { Input } from "@trumpet-pods/ui/components/input";
+import { ScrollArea } from "@trumpet-pods/ui/components/scroll-area";
+import { Separator } from "@trumpet-pods/ui/components/separator";
 import {
   Sheet,
   SheetDescription,
   SheetHeader,
   SheetPopup,
   SheetTitle,
-} from "@k22i/ui/components/sheet";
-import { Skeleton } from "@k22i/ui/components/skeleton";
+} from "@trumpet-pods/ui/components/sheet";
+import { Skeleton } from "@trumpet-pods/ui/components/skeleton";
 import {
   Tooltip,
   TooltipPopup,
   TooltipTrigger,
-} from "@k22i/ui/components/tooltip";
-import { useMediaQuery } from "@k22i/ui/hooks/use-media-query";
-import { cn } from "@k22i/ui/lib/utils";
+} from "@trumpet-pods/ui/components/tooltip";
+import { useMediaQuery } from "@trumpet-pods/ui/hooks/use-media-query";
+import { cn } from "@trumpet-pods/ui/lib/utils";
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";

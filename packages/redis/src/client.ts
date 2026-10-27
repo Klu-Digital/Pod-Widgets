@@ -1,4 +1,4 @@
-import { log } from "@k22i/observability";
+import { log } from "@trumpet-pods/observability";
 import Redis from "ioredis";
 
 import { resolveRedisConfig } from "./config";

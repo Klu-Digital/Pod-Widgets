@@ -1,4 +1,4 @@
-import { env } from "@k22i/env/shared-server";
+import { env } from "@trumpet-pods/env/shared-server";
 
 export interface StorageConfig {
   bucket: string;

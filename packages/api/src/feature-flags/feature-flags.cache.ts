@@ -1,12 +1,12 @@
-import type { Database } from "@k22i/db";
-import { featureFlag } from "@k22i/db/schema/feature-flags";
-import type { FeatureFlagName, FeatureFlags } from "@k22i/env/flags";
+import type { Database } from "@trumpet-pods/db";
+import { featureFlag } from "@trumpet-pods/db/schema/feature-flags";
+import type { FeatureFlagName, FeatureFlags } from "@trumpet-pods/env/flags";
 import {
   FEATURE_FLAG_DEFAULTS,
   FEATURE_FLAG_NAMES,
   FEATURE_FLAG_TTL_MS,
-} from "@k22i/env/flags";
-import { log, parseError } from "@k22i/observability";
+} from "@trumpet-pods/env/flags";
+import { log, parseError } from "@trumpet-pods/observability";
 
 /** Extra grace when the read fails, so a flapping database isn't re-queried per request. */
 const ERROR_GRACE_MS = 5000;
