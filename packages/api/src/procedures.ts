@@ -1,6 +1,7 @@
 import { ORPCError, os } from "@orpc/server";
 import type { FeatureFlagName } from "@trumpet-pods/env/flags";
 import { orpcLogger } from "@trumpet-pods/observability/orpc";
+import { z } from "zod";
 
 import type { Context } from "./context";
 import { isFeatureEnabled } from "./feature-flags/feature-flags.cache";
@@ -70,6 +71,51 @@ const afterCommit = o.middleware(async ({ context, next }) => {
 });
 
 export const mutationProcedure = publicProcedure
+  .use(afterCommit)
+  .use(transaction);
+
+const IDENTITY_NAME_MAX = 60;
+
+const identityIdSchema = z.uuid();
+const identityNameSchema = z.string().trim().min(1).max(IDENTITY_NAME_MAX);
+
+// Trust-the-client: the headers are self-asserted, not a security boundary.
+const identity = o.middleware(({ context, next }) => {
+  const { id, name: encodedName } = context.identityHeaders;
+  let name: string | undefined;
+  try {
+    // The web encodes the name: fetch rejects header characters above U+00FF.
+    name =
+      encodedName === undefined ? undefined : decodeURIComponent(encodedName);
+  } catch {
+    throw new ORPCError("BAD_REQUEST");
+  }
+  const parsedId = identityIdSchema.safeParse(id);
+  const parsedName = identityNameSchema.safeParse(name);
+  if (!(parsedId.success && parsedName.success)) {
+    throw new ORPCError("BAD_REQUEST");
+  }
+  return next({
+    context: { identity: { id: parsedId.data, name: parsedName.data } },
+  });
+});
+
+/**
+ * `publicProcedure` that answers BAD_REQUEST without a valid identity and types
+ * `context.identity`; no router uses it until #11.
+ *
+ * @public
+ */
+export const identityProcedure = publicProcedure.use(identity);
+
+/**
+ * `mutationProcedure` behind the identity check, which runs before the
+ * transaction opens so a rejected call never takes a connection.
+ *
+ * @public
+ */
+export const identityMutationProcedure = publicProcedure
+  .use(identity)
   .use(afterCommit)
   .use(transaction);
 

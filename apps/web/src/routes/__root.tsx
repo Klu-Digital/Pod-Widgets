@@ -9,6 +9,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Button } from "@trumpet-pods/ui/components/button";
 import { ToastProvider } from "@trumpet-pods/ui/components/toast";
 
+import { IdentityGate } from "@/components/identity-dialog";
 import { ThemeProvider } from "@/components/theme-provider";
 import type { orpc } from "@/utils/orpc";
 
@@ -30,6 +31,7 @@ const RootComponent = () => (
     >
       <ToastProvider>
         <Outlet />
+        <IdentityGate />
       </ToastProvider>
     </ThemeProvider>
     <TanStackRouterDevtools position="bottom-left" />

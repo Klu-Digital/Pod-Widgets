@@ -14,6 +14,10 @@ export interface CreateContextOptions {
 
 export const createContext = ({ context, ip }: CreateContextOptions) => ({
   db,
+  identityHeaders: {
+    id: context.req.header("x-identity-id") || undefined,
+    name: context.req.header("x-identity-name") || undefined,
+  },
   ip,
   log: context.get("log"),
 });
