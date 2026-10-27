@@ -46,13 +46,25 @@ const parse = (raw: string | null): Identity | null => {
 };
 
 /** Referentially stable until the stored string changes, as the hook needs. */
-export const getIdentity = (): Identity | null => {
+const getIdentity = (): Identity | null => {
   const raw = readRaw();
   if (raw !== cachedRaw) {
     cachedRaw = raw;
     cachedIdentity = parse(raw);
   }
   return cachedIdentity;
+};
+
+/** The headers the API's identity rungs read; empty before a name is saved. */
+export const identityHeaders = (): Record<string, string> => {
+  const identity = getIdentity();
+  // Encoded: fetch rejects header characters above U+00FF, e.g. "Zoë".
+  return identity
+    ? {
+        "x-identity-id": identity.id,
+        "x-identity-name": encodeURIComponent(identity.name),
+      }
+    : {};
 };
 
 /** Keeps the id when one exists, so renaming does not become a new author. */
