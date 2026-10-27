@@ -34,7 +34,7 @@ try {
   if (existing.rows.length === 0) {
     try {
       await maintenanceClient.query(
-        `CREATE DATABASE "${workerDbName}" TEMPLATE trumpet-pods_template`
+        `CREATE DATABASE "${workerDbName}" TEMPLATE "trumpet-pods_template"`
       );
     } catch (error) {
       // Setup files run once per test FILE, not per worker, so two files can race
