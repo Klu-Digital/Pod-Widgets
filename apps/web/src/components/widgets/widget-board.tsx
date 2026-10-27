@@ -41,11 +41,11 @@ export const WidgetBoard = () => {
   const createWidget = useMutation(orpc.widgets.create.mutationOptions());
 
   const add = (type: string) => {
-    if (!pageId || type !== "text") {
+    if (!pageId || (type !== "text" && type !== "banner")) {
       return;
     }
     createWidget.mutate(
-      { pageId, type },
+      type === "banner" ? { pageId, type, variant: "info" } : { pageId, type },
       {
         onSuccess: (created) => {
           queryClient.setQueryData(
@@ -62,7 +62,15 @@ export const WidgetBoard = () => {
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Pod Widgets</h1>
-        {pageId ? <AddWidgetButton onAdd={add} /> : null}
+        {pageId ? (
+          <AddWidgetButton
+            onAdd={add}
+            types={[
+              { label: "Text", type: "text" },
+              { label: "Banner", type: "banner" },
+            ]}
+          />
+        ) : null}
       </div>
       {widgets.data?.map((widget) => (
         <WidgetByType

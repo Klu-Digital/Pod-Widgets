@@ -49,9 +49,7 @@ export const useAutosave = (widgetId: string, content: RichTextDoc) => {
         { queryKey: orpc.widgets.list.key() },
         (list) =>
           list?.map((item) =>
-            item.id === id && item.type === "text"
-              ? { ...item, content: saved }
-              : item
+            item.id === id ? { ...item, content: saved } : item
           )
       );
     },
