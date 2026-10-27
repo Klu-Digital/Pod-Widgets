@@ -112,7 +112,7 @@ See [`packages/db/src/dev-scripts/post-migrate/README.md`](packages/db/src/dev-s
 
 ## UI Customization
 
-React web apps in this stack share [coss ui](https://coss.com/ui) primitives through `packages/ui`. coss ui is a Base UI + Tailwind component set distributed through the shadcn CLI, so the registry is wired up in `components.json` as `@coss` and the files are vendored, not installed.
+React web apps in this stack share [coss ui](https://coss.com/ui) primitives through `packages/ui`. coss ui is a Base UI + Tailwind component set distributed through the shadcn CLI, so the registry is wired up in `components.json` as `@coss` and the files are vendored, not installed. Only the primitives the app imports are vendored; add the rest on demand.
 
 - Change design tokens and global styles in `packages/ui/src/styles/globals.css`
 - Update shared primitives in `packages/ui/src/components/*`

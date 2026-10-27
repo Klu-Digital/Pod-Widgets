@@ -120,15 +120,15 @@ importers:
 
   .:
     devDependencies:
+      '@shadcn/lint':
+        specifier: ^0.1.5
+        version: 0.1.5(@typescript-eslint/parser@8.70.0(@typescript/typescript6@6.0.2)(eslint@10.10.0(jiti@2.7.0)))(eslint@10.10.0(jiti@2.7.0))
       '@trumpet-pods/config':
         specifier: workspace:*
         version: link:packages/config
       '@trumpet-pods/testing':
         specifier: workspace:*
         version: link:packages/testing
-      '@shadcn/lint':
-        specifier: ^0.1.5
-        version: 0.1.5(@typescript-eslint/parser@8.70.0(@typescript/typescript6@6.0.2)(eslint@10.10.0(jiti@2.7.0)))(eslint@10.10.0(jiti@2.7.0))
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
@@ -196,6 +196,9 @@ importers:
         specifier: 'catalog:'
         version: 4.6.5
     devDependencies:
+      '@orpc/client':
+        specifier: 'catalog:'
+        version: 1.15.4(@opentelemetry/api@1.9.1)
       '@trumpet-pods/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -217,9 +220,6 @@ importers:
       '@trumpet-pods/redis':
         specifier: workspace:*
         version: link:../../packages/redis
-      '@orpc/client':
-        specifier: 'catalog:'
-        version: 1.15.4(@opentelemetry/api@1.9.1)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
@@ -247,15 +247,6 @@ importers:
       '@hugeicons/react':
         specifier: 'catalog:'
         version: 1.1.10(react@19.3.0)
-      '@trumpet-pods/api':
-        specifier: workspace:*
-        version: link:../../packages/api
-      '@trumpet-pods/env':
-        specifier: workspace:*
-        version: link:../../packages/env
-      '@trumpet-pods/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@orpc/client':
         specifier: 'catalog:'
         version: 1.15.4(@opentelemetry/api@1.9.1)
@@ -271,6 +262,15 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.170.41
         version: 1.170.41(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@trumpet-pods/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@trumpet-pods/env':
+        specifier: workspace:*
+        version: link:../../packages/env
+      '@trumpet-pods/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       next-themes:
         specifier: 'catalog:'
         version: 0.4.6(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -281,9 +281,6 @@ importers:
         specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)
     devDependencies:
-      '@trumpet-pods/config':
-        specifier: workspace:*
-        version: link:../../packages/config
       '@tanstack/react-query-devtools':
         specifier: ^5.104.1
         version: 5.104.1(@tanstack/react-query@5.104.1(react@19.3.0))(@types/react@19.3.0)(csstype@3.2.3)(react@19.3.0)
@@ -302,6 +299,9 @@ importers:
       '@testing-library/react':
         specifier: ^16.3.3
         version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@trumpet-pods/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
@@ -393,6 +393,9 @@ importers:
 
   packages/api:
     dependencies:
+      '@orpc/server':
+        specifier: 'catalog:'
+        version: 1.15.4(@opentelemetry/api@1.9.1)(ws@8.21.3)
       '@trumpet-pods/db':
         specifier: workspace:*
         version: link:../db
@@ -408,9 +411,6 @@ importers:
       '@trumpet-pods/redis':
         specifier: workspace:*
         version: link:../redis
-      '@orpc/server':
-        specifier: 'catalog:'
-        version: 1.15.4(@opentelemetry/api@1.9.1)(ws@8.21.3)
       drizzle-orm:
         specifier: 'catalog:'
         version: 1.0.0-rc.4(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(pg@8.23.1)(zod@4.6.5)
@@ -519,12 +519,12 @@ importers:
         specifier: 'catalog:'
         version: 2.30.0(@orpc/server@1.15.4(@opentelemetry/api@1.9.1)(ws@8.21.3))(express@5.2.1)(hono@4.13.13)(react@19.3.0)(vite@8.2.2(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
     devDependencies:
-      '@trumpet-pods/config':
-        specifier: workspace:*
-        version: link:../config
       '@orpc/server':
         specifier: 'catalog:'
         version: 1.15.4(@opentelemetry/api@1.9.1)(ws@8.21.3)
+      '@trumpet-pods/config':
+        specifier: workspace:*
+        version: link:../config
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
@@ -646,12 +646,12 @@ importers:
         specifier: 'catalog:'
         version: 12.37.0(@opentelemetry/api@1.9.1)
     devDependencies:
-      '@trumpet-pods/config':
-        specifier: workspace:*
-        version: link:../config
       '@testcontainers/postgresql':
         specifier: ^12.2.0
         version: 12.2.0
+      '@trumpet-pods/config':
+        specifier: workspace:*
+        version: link:../config
       '@types/pg':
         specifier: ^8.23.1
         version: 8.23.1
@@ -673,9 +673,6 @@ importers:
       '@base-ui/react':
         specifier: ^1.8.0
         version: 1.8.0(@date-fns/tz@1.5.0)(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@daypicker/react':
-        specifier: ^10.0.2
-        version: 10.0.2(@types/react@19.3.0)(react@19.3.0)
       '@hugeicons/core-free-icons':
         specifier: 'catalog:'
         version: 4.3.5
@@ -716,12 +713,12 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
     devDependencies:
-      '@trumpet-pods/config':
-        specifier: workspace:*
-        version: link:../config
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
+      '@trumpet-pods/config':
+        specifier: workspace:*
+        version: link:../config
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -1061,16 +1058,6 @@ packages:
 
   '@date-fns/tz@1.5.0':
     resolution: {integrity: sha512-lwYN/vDPeNRULcepoE/LO2Pgx+7/RV+S9ARfbc9lr2DtGkOD7pAiruHvbR1RX3Qyf6ja47EWJDMsNK5vK08DJg==}
-
-  '@daypicker/react@10.0.2':
-    resolution: {integrity: sha512-Z/gvGXnc/xjRr5Z6l9OhIey00C7kwbIyJ85Pff9B9EWDkjTlkTQztB3qeylmGJDQ9xmxRJUV1W+02rskqarUBw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@types/react': '>=16.8.0'
-      react: '>=16.8.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
 
   '@dotenvx/dotenvx@1.75.1':
     resolution: {integrity: sha512-/BITOC9dmS/edY2zQwZNicQ059O6RKabtQfyEafV0nGtfYRNHYy1DIPiYVcov40+tob9hfmBnbR963dS+EQ1DQ==}
@@ -6253,16 +6240,6 @@ packages:
     resolution: {integrity: sha512-K5zQjDllxWkf7Z5xJdV0/B0WTNqx6vxG70zJE4N0kBs4LovmEYWJzQGxC9bS9RAKu3bgM40lrd5zoLJ12MQ5BA==}
     engines: {node: '>= 0.10'}
 
-  react-day-picker@10.0.2:
-    resolution: {integrity: sha512-QetiKtZWE9Uaw/pM/SYNv6WPYOTRnSJ2puL0GgwkmUFMIwiY0dtjH1W4B7DOVXVNQM0ZOClGpH/heOfBSzWeiA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@types/react': '>=16.8.0'
-      react: '>=16.8.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
   react-dom@19.3.0:
     resolution: {integrity: sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==}
     peerDependencies:
@@ -7702,14 +7679,8 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
-  '@date-fns/tz@1.5.0': {}
-
-  '@daypicker/react@10.0.2(@types/react@19.3.0)(react@19.3.0)':
-    dependencies:
-      react: 19.3.0
-      react-day-picker: 10.0.2(@types/react@19.3.0)(react@19.3.0)
-    optionalDependencies:
-      '@types/react': 19.3.0
+  '@date-fns/tz@1.5.0':
+    optional: true
 
   '@dotenvx/dotenvx@1.75.1':
     dependencies:
@@ -10346,7 +10317,8 @@ snapshots:
     transitivePeerDependencies:
       - '@noble/hashes'
 
-  date-fns@4.4.0: {}
+  date-fns@4.4.0:
+    optional: true
 
   debounce-fn@4.0.0:
     dependencies:
@@ -12044,14 +12016,6 @@ snapshots:
       http-errors: 2.0.1
       iconv-lite: 0.7.3
       unpipe: 1.0.0
-
-  react-day-picker@10.0.2(@types/react@19.3.0)(react@19.3.0):
-    dependencies:
-      '@date-fns/tz': 1.5.0
-      date-fns: 4.4.0
-      react: 19.3.0
-    optionalDependencies:
-      '@types/react': 19.3.0
 
   react-dom@19.3.0(react@19.3.0):
     dependencies:

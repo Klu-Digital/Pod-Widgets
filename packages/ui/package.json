@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
-    "@daypicker/react": "^10.0.2",
     "@hugeicons/core-free-icons": "catalog:",
     "@hugeicons/react": "catalog:",
     "@tiptap/core": "3.32.0",
