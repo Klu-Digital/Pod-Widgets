@@ -7,6 +7,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { AddWidgetButton } from "@/components/add-widget-button";
+import { ActivitySheet } from "@/components/widgets/activity-sheet";
 import { WidgetByType } from "@/components/widgets/registry";
 import type { BoardWidget } from "@/components/widgets/registry";
 import { useIdentity } from "@/lib/identity";
@@ -62,7 +63,12 @@ export const WidgetBoard = () => {
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Pod Widgets</h1>
-        {pageId ? <AddWidgetButton onAdd={add} /> : null}
+        {pageId ? (
+          <div className="flex items-center gap-2">
+            <ActivitySheet pageId={pageId} />
+            <AddWidgetButton onAdd={add} />
+          </div>
+        ) : null}
       </div>
       {widgets.data?.map((widget) => (
         <WidgetByType

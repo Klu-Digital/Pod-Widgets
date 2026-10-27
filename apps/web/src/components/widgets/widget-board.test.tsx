@@ -15,6 +15,7 @@ const api = vi.hoisted(() => ({
 
 vi.mock("@/utils/client", () => ({
   client: {
+    audit: { list: vi.fn() },
     pages: { create: vi.fn(), list: api.listPages },
     widgets: {
       create: api.createWidget,
