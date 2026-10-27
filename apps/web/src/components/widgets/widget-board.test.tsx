@@ -1,5 +1,12 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { toastManager } from "@trumpet-pods/ui/components/toast";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 
 vi.mock("@trumpet-pods/ui/components/toast", () => ({
@@ -8,8 +15,10 @@ vi.mock("@trumpet-pods/ui/components/toast", () => ({
 
 const api = vi.hoisted(() => ({
   createWidget: vi.fn(),
+  deleteWidget: vi.fn(),
   listPages: vi.fn(),
   listWidgets: vi.fn(),
+  restoreWidget: vi.fn(),
   updateContent: vi.fn(),
 }));
 
@@ -18,7 +27,9 @@ vi.mock("@/utils/client", () => ({
     pages: { create: vi.fn(), list: api.listPages },
     widgets: {
       create: api.createWidget,
+      delete: api.deleteWidget,
       list: api.listWidgets,
+      restore: api.restoreWidget,
       updateContent: api.updateContent,
     },
   },
@@ -64,6 +75,8 @@ beforeEach(() => {
   api.listPages.mockResolvedValue([{ id: PAGE_ID, title: "Welcome" }]);
   api.listWidgets.mockResolvedValue([]);
   api.updateContent.mockResolvedValue(null);
+  api.deleteWidget.mockResolvedValue(null);
+  api.restoreWidget.mockResolvedValue(null);
   api.createWidget.mockResolvedValue({
     content: { content: [{ type: "paragraph" }], type: "doc" },
     createdBy: "Kevin",
@@ -110,6 +123,43 @@ it("adds a widget and coalesces edits into one save", async () => {
     },
     id: WIDGET_ID,
   });
+});
+
+it("deletes a widget at once and brings it back with Undo", async () => {
+  localStorage.setItem(
+    "pod-widgets:identity",
+    JSON.stringify({ id: "me", name: "Kevin" })
+  );
+  api.listWidgets.mockResolvedValue([
+    {
+      content: { content: [{ type: "paragraph" }], type: "doc" },
+      createdBy: "Kevin",
+      id: WIDGET_ID,
+      pageId: PAGE_ID,
+      type: "text",
+    },
+  ]);
+  renderBoard();
+
+  fireEvent.click(await screen.findByLabelText("Delete widget"));
+  await waitFor(() => {
+    expect(screen.queryByLabelText("Text widget")).not.toBeInTheDocument();
+  });
+  await waitFor(() => {
+    expect(api.deleteWidget).toHaveBeenCalledWith({ id: WIDGET_ID });
+  });
+
+  const toast = vi
+    .mocked(toastManager.add)
+    .mock.calls.map(([options]) => options)
+    .find((options) => options.title === "Widget deleted");
+  expect(toast).toMatchObject({ timeout: 10_000, title: "Widget deleted" });
+  act(() => {
+    toast?.actionProps?.onClick?.({} as never);
+  });
+
+  await screen.findByLabelText("Text widget");
+  expect(api.restoreWidget).toHaveBeenCalledWith({ id: WIDGET_ID });
 });
 
 it("fires no request before an identity exists", async () => {

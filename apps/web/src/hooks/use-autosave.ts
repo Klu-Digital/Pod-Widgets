@@ -40,7 +40,7 @@ const saveOnExit = async (id: string, content: ContentInput) => {
 /** Saves `content` 800 ms after the last change and whenever the page leaves. */
 export const useAutosave = (widgetId: string, content: RichTextDoc) => {
   const queryClient = useQueryClient();
-  const { isError, isPending, isSuccess, mutate } = useMutation({
+  const { isError, isPending, isSuccess, mutateAsync } = useMutation({
     ...orpc.widgets.updateContent.mutationOptions(),
     meta: { suppressErrorToast: true },
     // A remounted editor seeds from this cache, so it must not serve old text.
@@ -61,26 +61,29 @@ export const useAutosave = (widgetId: string, content: RichTextDoc) => {
   const saved = useRef(content);
   const timer = useRef(0);
 
-  const flush = useCallback(() => {
+  // Resolves once every save started so far has settled; never rejects.
+  const settled = useRef<Promise<unknown>>(Promise.resolve());
+
+  const flush = useCallback(async (): Promise<void> => {
     clearTimeout(timer.current);
     const doc = latest.current;
     const previous = saved.current;
-    if (doc === previous) {
-      return;
-    }
-    saved.current = doc;
-    mutate(
-      { content: doc as ContentInput, id: widgetId },
-      {
-        onError: () => {
+    if (doc !== previous) {
+      saved.current = doc;
+      const save = (async () => {
+        try {
+          await mutateAsync({ content: doc as ContentInput, id: widgetId });
+        } catch {
           // Lets the next blur or edit retry instead of treating it as saved.
           if (saved.current === doc) {
             saved.current = previous;
           }
-        },
-      }
-    );
-  }, [mutate, widgetId]);
+        }
+      })();
+      settled.current = Promise.all([settled.current, save]);
+    }
+    await settled.current;
+  }, [mutateAsync, widgetId]);
 
   useEffect(() => {
     latest.current = content;
@@ -114,7 +117,12 @@ export const useAutosave = (widgetId: string, content: RichTextDoc) => {
   }, [widgetId]);
 
   // Unmounting must save the pending edit, not drop it.
-  useEffect(() => flush, [flush]);
+  useEffect(
+    () => () => {
+      void flush();
+    },
+    [flush]
+  );
 
   let status: SaveStatus = "idle";
   if (isPending) {

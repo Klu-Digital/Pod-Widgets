@@ -1,8 +1,11 @@
+import { Delete02Icon } from "@hugeicons/core-free-icons";
 import { RichTextEditor } from "@trumpet-pods/ui/components/rich-text-editor";
 import type { RichTextDoc } from "@trumpet-pods/ui/components/rich-text-editor";
 import { useState } from "react";
 
+import { IconButton } from "@/components/icon-button";
 import { WidgetFrame } from "@/components/widget-frame";
+import type { DeleteHandler, PendingSave } from "@/components/widgets/registry";
 import { useAutosave } from "@/hooks/use-autosave";
 import type { SaveStatus } from "@/hooks/use-autosave";
 import type { RouterOutputs } from "@/utils/orpc";
@@ -21,9 +24,11 @@ const STATUS_LABEL: Record<SaveStatus, string> = {
 
 export const TextWidget = ({
   autoFocus,
+  onDelete,
   widget,
 }: {
   autoFocus: boolean;
+  onDelete: DeleteHandler;
   widget: TextWidgetData;
 }) => {
   // The API checks only the doc root; the editor owns the rest of the shape.
@@ -32,7 +37,21 @@ export const TextWidget = ({
   const { flush, status } = useAutosave(widget.id, content);
 
   return (
-    <WidgetFrame aria-label="Text widget">
+    <WidgetFrame
+      actions={
+        <IconButton
+          aria-label="Delete widget"
+          icon={Delete02Icon}
+          onClick={() =>
+            onDelete({
+              content: content as PendingSave["content"],
+              saved: flush(),
+            })
+          }
+        />
+      }
+      aria-label="Text widget"
+    >
       <RichTextEditor
         aria-label="Widget text"
         autoFocus={autoFocus}

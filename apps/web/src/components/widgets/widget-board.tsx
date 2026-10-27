@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { AddWidgetButton } from "@/components/add-widget-button";
 import { WidgetByType } from "@/components/widgets/registry";
 import type { BoardWidget } from "@/components/widgets/registry";
+import { useDeleteWidget } from "@/components/widgets/use-delete-widget";
 import { useIdentity } from "@/lib/identity";
 import { orpc } from "@/utils/orpc";
 
@@ -39,6 +40,7 @@ export const WidgetBoard = () => {
     enabled,
   });
   const createWidget = useMutation(orpc.widgets.create.mutationOptions());
+  const deleteWidget = useDeleteWidget();
 
   const add = (type: string) => {
     if (!pageId || type !== "text") {
@@ -68,6 +70,7 @@ export const WidgetBoard = () => {
         <WidgetByType
           autoFocus={widget.id === focusId}
           key={widget.id}
+          onDelete={(pending) => deleteWidget(widget, pending)}
           widget={widget}
         />
       ))}
