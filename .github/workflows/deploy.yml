@@ -41,7 +41,7 @@ on:
 permissions: {}
 
 # Never cancel a deploy in flight. Cancelling between the Dokploy calls leaves
-# server, workers and web on different releases. Runs queue instead.
+# server and web on different releases. Runs queue instead.
 concurrency:
   group: deploy-${{ inputs.environment }}
   cancel-in-progress: false
@@ -67,7 +67,6 @@ jobs:
       tag: ${{ steps.resolve.outputs.tag }}
       web: ${{ steps.resolve.outputs.web }}
       server: ${{ steps.resolve.outputs.server }}
-      workers: ${{ steps.resolve.outputs.workers }}
       digests: ${{ steps.resolve.outputs.digests }}
     steps:
       - name: Log in to Container Registry
@@ -99,7 +98,7 @@ jobs:
           repo=$(echo "$REPOSITORY" | tr '[:upper:]' '[:lower:]')
 
           digests=""
-          for app in web server workers; do
+          for app in web server; do
             ref="${REGISTRY}/${repo}/${app}:${tag}"
             # The verification that makes promotion safe: if this SHA was never
             # built (wrong branch, a force-push that orphaned the commit, a
@@ -159,10 +158,8 @@ jobs:
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
           WEB_ID: ${{ vars.DOKPLOY_WEB_APPLICATION_ID }}
           SERVER_ID: ${{ vars.DOKPLOY_SERVER_APPLICATION_ID }}
-          WORKERS_ID: ${{ vars.DOKPLOY_WORKERS_APPLICATION_ID }}
           WEB_IMAGE: ${{ needs.resolve.outputs.web }}
           SERVER_IMAGE: ${{ needs.resolve.outputs.server }}
-          WORKERS_IMAGE: ${{ needs.resolve.outputs.workers }}
         run: |
           set -euo pipefail
 
@@ -205,12 +202,10 @@ jobs:
               "$(jq -n --arg id "$id" '{applicationId: $id}')"
           }
 
-          # Server before workers so the queue's producer and consumer are never
-          # more than one release apart in the wrong direction, and web last so
-          # the SPA is the final thing to change under a user mid-session.
-          release server  "$SERVER_ID"  "$SERVER_IMAGE"
-          release workers "$WORKERS_ID" "$WORKERS_IMAGE"
-          release web     "$WEB_ID"     "$WEB_IMAGE"
+          # Web last so the SPA is the final thing to change under a user
+          # mid-session.
+          release server "$SERVER_ID" "$SERVER_IMAGE"
+          release web    "$WEB_ID"    "$WEB_IMAGE"
 
       # `application.deploy` returns as soon as the deploy is QUEUED, not when it
       # is live — so without this step every job below would race the rollout.

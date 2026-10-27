@@ -10,14 +10,14 @@ import { describe, expect, it } from "vite-plus/test";
 
 const repoRoot = path.join(import.meta.dirname, "..", "..", "..");
 
-const EXAMPLES = ["apps/server/.env.example", "apps/workers/.env.example"];
+const EXAMPLES = ["apps/server/.env.example"];
 
 /**
  * Reads the names out of the schema's source, not the `env` object: t3-env's
  * proxy throws on an unset optional.
  */
 const declaredServerVars = (): string[] => {
-  const sources = ["shared-server.ts", "server.ts", "workers.ts"].map((file) =>
+  const sources = ["shared-server.ts", "server.ts"].map((file) =>
     readFileSync(path.join(repoRoot, "packages/env/src", file), "utf-8")
   );
   const names = sources.flatMap((source) => [
@@ -42,7 +42,7 @@ const documentedVars = (): Set<string> => {
 describe(".env.example coverage", () => {
   it("finds variables to check, so a broken regex fails loudly rather than passing vacuously", () => {
     expect(declaredServerVars().length).toBeGreaterThan(10);
-    expect(documentedVars().size).toBeGreaterThan(20);
+    expect(documentedVars().size).toBeGreaterThan(10);
   });
 
   it("documents every variable @trumpet-pods/env/server declares", () => {

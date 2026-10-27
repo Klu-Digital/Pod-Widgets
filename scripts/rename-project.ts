@@ -39,12 +39,7 @@ const NAME_PATTERN = /^[a-z][a-z0-9-]*$/u;
 /**
  * `.env` files are untracked by design but carry the database name and bucket.
  */
-const UNTRACKED_CANDIDATES = [
-  ".env",
-  "apps/server/.env",
-  "apps/web/.env",
-  "apps/workers/.env",
-];
+const UNTRACKED_CANDIDATES = [".env", "apps/server/.env", "apps/web/.env"];
 
 interface Leftover {
   path: string;

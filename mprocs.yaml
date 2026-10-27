@@ -1,4 +1,4 @@
-# Panes for `pnpm dev`. Infra (postgres, redis, minio) is already up by the time
+# Panes for `pnpm dev`. Infra (postgres, minio) is already up by the time
 # mprocs starts — `pnpm dev` runs `dev:infra` first — so these are the host
 # processes only.
 #
@@ -18,27 +18,21 @@ procs:
     shell: vp run --filter web dev
 
   # `send-keys` rather than `stop: SIGINT`, and the difference is not cosmetic.
-  # These procs are three processes deep — a shell running `vp run`, which spawns
+  # This proc is three processes deep — a shell running `vp run`, which spawns
   # `tsx watch`, which spawns node — and a signal `stop` is delivered to the
   # direct child only, so the node process that installed the shutdown handler
   # never sees it and dies with the pty instead. Writing C-c to the terminal
   # makes the tty line discipline signal the whole foreground process group, the
-  # way pressing Ctrl-C in a real terminal does. Verified by watching for
-  # `workers.shutdown` in the log: absent with `stop: SIGINT`, present with this.
+  # way pressing Ctrl-C in a real terminal does.
   #
-  # It matters because the workers shutdown drains in-flight jobs rather than
-  # abandoning them to expiry — see the comment in apps/workers/src/index.ts.
+  # It matters because the server's shutdown drains in-flight requests and
+  # flushes buffered logs — see apps/server/src/index.ts.
   server:
     shell: vp run --filter server dev
     stop:
       send-keys: ["<C-c>"]
 
-  workers:
-    shell: vp run --filter workers dev
-    stop:
-      send-keys: ["<C-c>"]
-
   # Container logs, on demand. `pnpm dev:infra` has already started these.
   infra:
-    shell: docker compose logs -f postgres redis minio
+    shell: docker compose logs -f postgres minio
     autostart: false

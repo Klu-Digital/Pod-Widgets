@@ -119,5 +119,3 @@ export const useMediaQuery = (
 
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 };
-
-export const useIsMobile = (): boolean => useMediaQuery("max-md");

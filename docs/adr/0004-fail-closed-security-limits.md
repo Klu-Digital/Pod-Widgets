@@ -1,6 +1,8 @@
 ---
-status: accepted
+status: superseded
 ---
+
+Superseded for this project: Redis and `rateLimit()` were removed while nothing used them. Restore both from git history and follow this again if rate limiting comes back.
 
 # Optional infrastructure fails open, except security and cost limits
 

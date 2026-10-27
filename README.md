@@ -57,13 +57,13 @@ This project uses PostgreSQL with Drizzle ORM.
 1. Make sure you have a PostgreSQL database set up.
 2. Update your `apps/server/.env` file with your PostgreSQL connection details.
 
-3. Apply migrations, pg-boss's schema and post-migration scripts to your database:
+3. Apply migrations and post-migration scripts to your database:
 
 ```bash
 pnpm run db:deploy
 ```
 
-`db:migrate` alone is not enough: reference rows and backfills live in post-migration scripts, never in migration SQL. In production the server image does all three on boot — see [Deployment](#deployment).
+`db:migrate` alone is not enough: reference rows and backfills live in post-migration scripts, never in migration SQL. In production the server image does both on boot — see [Deployment](#deployment).
 
 Then, run the development server:
 
@@ -71,7 +71,7 @@ Then, run the development server:
 pnpm run dev
 ```
 
-`pnpm run dev` brings up the infrastructure containers and then opens [mprocs](https://github.com/pvolok/mprocs), a small terminal UI that gives each process its own pane and its own scrollback rather than interleaving everything into one stream. `web`, `server` and `workers` start automatically; `infra` (container logs) is listed but idle — select one and press `s` to start it.
+`pnpm run dev` brings up the infrastructure containers and then opens [mprocs](https://github.com/pvolok/mprocs), a small terminal UI that gives each process its own pane and its own scrollback rather than interleaving everything into one stream. `web` and `server` start automatically; `infra` (container logs) is listed but idle — select one and press `s` to start it.
 
 | Key |  |
 | --- | --- |
@@ -86,15 +86,13 @@ Open [http://localhost:2600](http://localhost:2600) in your browser to see the w
 
 ### Ports
 
-| Service          | Default | Override with                             |
-| ---------------- | ------- | ----------------------------------------- |
-| server           | `1900`  | `PORT` (env var or `apps/server/.env`)    |
-| web              | `2600`  | `WEB_PORT` (env var; `PORT` also honored) |
-| workers (health) | `1901`  | `WORKERS_PORT`                            |
-| postgres         | `4400`  | `POSTGRES_PORT`                           |
-| redis            | `6666`  | `REDIS_PORT` (not Redis's default `6379`) |
-| minio (S3 API)   | `5300`  | `MINIO_PORT`                              |
-| minio (console)  | `5301`  | `MINIO_CONSOLE_PORT`                      |
+| Service         | Default | Override with                             |
+| --------------- | ------- | ----------------------------------------- |
+| server          | `1900`  | `PORT` (env var or `apps/server/.env`)    |
+| web             | `2600`  | `WEB_PORT` (env var; `PORT` also honored) |
+| postgres        | `4400`  | `POSTGRES_PORT`                           |
+| minio (S3 API)  | `5300`  | `MINIO_PORT`                              |
+| minio (console) | `5301`  | `MINIO_CONSOLE_PORT`                      |
 
 For Docker Compose, set `SERVER_PORT` / `WEB_PORT` (e.g. in a root `.env` file) to remap both the published ports and the wiring between services.
 
@@ -112,7 +110,7 @@ See [`packages/db/src/dev-scripts/post-migrate/README.md`](packages/db/src/dev-s
 
 ## UI Customization
 
-React web apps in this stack share [coss ui](https://coss.com/ui) primitives through `packages/ui`. coss ui is a Base UI + Tailwind component set distributed through the shadcn CLI, so the registry is wired up in `components.json` as `@coss` and the files are vendored, not installed.
+React web apps in this stack share [coss ui](https://coss.com/ui) primitives through `packages/ui`. coss ui is a Base UI + Tailwind component set distributed through the shadcn CLI, so the registry is wired up in `components.json` as `@coss` and the files are vendored, not installed. Only the primitives the app imports are vendored; add the rest on demand.
 
 - Change design tokens and global styles in `packages/ui/src/styles/globals.css`
 - Update shared primitives in `packages/ui/src/components/*`
@@ -181,7 +179,7 @@ Operator-facing setup — running the images, the first account, proxies, option
 
 ### Docker Compose
 
-- Target: web + server + workers
+- Target: web + server
 - Config: `docker-compose.yml` (app Dockerfiles live in `apps/*/Dockerfile`)
 - Build images: pnpm run docker:build
 - Start: pnpm run docker:up
@@ -193,8 +191,8 @@ Environment variables are read from each app's `.env` file (baked into web build
 The stack mirrors production:
 
 - **One published port.** Only the web container publishes one (`WEB_PORT`, container port 2600, because the unprivileged nginx image cannot bind 80). The API is reached through its proxy and needs no public hostname.
-- **Three images, all non-root**, each with its own `HEALTHCHECK`. The server and workers images are `pnpm deploy --prod` output plus the bundle — no tsx, drizzle-kit or workspace source.
-- **The server migrates its own database on boot** in production (`apps/server/src/start.ts`): drizzle migrations, pg-boss's schema, then pending post-migration scripts in the background. CI never connects to the database. The compose stack skips this because a local database is usually push-built; run `pnpm db:deploy` yourself.
+- **Two images, all non-root**, each with its own `HEALTHCHECK`. The server image is `pnpm deploy --prod` output plus the bundle — no tsx, drizzle-kit or workspace source.
+- **The server migrates its own database on boot** in production (`apps/server/src/start.ts`): drizzle migrations, then pending post-migration scripts in the background. CI never connects to the database. The compose stack skips this because a local database is usually push-built; run `pnpm db:deploy` yourself.
 
 ### Releases and image tags
 
@@ -206,10 +204,9 @@ The web image serves the SPA through nginx using `apps/web/nginx.conf.template`,
 
 `VITE_SERVER_URL` defaults to `/`, meaning "the origin that served this page". nginx forwards `/rpc` to `SERVER_UPSTREAM`, plus `/health/ready` for an outside uptime monitor, so the browser only ever talks to one origin. Nothing environment-specific is inlined at build time, which is what lets a single built image be promoted from staging to production rather than rebuilt per environment. `apps/web/vite.config.ts` proxies the same prefix so `pnpm dev` runs the same topology.
 
-Three consequences worth knowing:
+Two consequences worth knowing:
 
 - **The API needs no public hostname.** It is reachable only through the web origin. `/api-reference` and the Prometheus metrics path are deliberately _not_ proxied, so they stay private, and `/api-reference` is not mounted at all when `NODE_ENV=production`.
-- **Set `TRUSTED_PROXY_HOPS` to the number of proxies in front of the server** — `1` for the web image's nginx alone, `2` with Traefik or a load balancer in front of that. The server resolves the client IP once per request, counting that many `x-forwarded-for` entries from the right, and hands it to the oRPC `rateLimit()` middleware. Left at `0` behind a proxy, every caller is identified by the proxy's address. See [apps/server/README.md](apps/server/README.md#client-ip-and-trusted_proxy_hops).
 - **`SERVER_UPSTREAM` goes through a resolver on purpose.** A hostname written literally into `proxy_pass` is resolved once at nginx startup and cached for the process's life, so recreating the API container would leave nginx posting at an address nothing answers on. The variable-plus-`resolver` form re-resolves per request.
 
 For more details, see the guide on [Deploying with Docker Compose](https://www.better-t-stack.dev/docs/guides/docker).
@@ -274,108 +271,17 @@ Two things that bite:
 - **`S3_ENDPOINT` and `S3_PUBLIC_ENDPOINT` are not the same thing.** A presigned URL bakes in the host it was signed against. Inside Compose the server reaches MinIO at `http://minio:9000`, but a URL with that host is useless to a browser — hence the separate public endpoint. Running the server outside Compose, both are `localhost`.
 - **Bucket CORS is separate from the server's CORS config.** The presigned `PUT` goes to the bucket, so the _bucket_ is what must allow it. Locally that is MinIO's `MINIO_API_CORS_ALLOW_ORIGIN` (already set in `docker-compose.yml`); on S3 or R2 it is a one-time bucket CORS rule allowing `PUT` from your web origin and exposing `ETag`.
 
-## Redis
+## Side effects after a mutation commits
 
-Redis backs two things: an oRPC `rateLimit()` middleware for our own procedures, and a `createCache()` primitive used at call sites throughout the API. It is **optional** — with `REDIS_URL` unset the server boots exactly as before: every rate limit counts in process memory instead, and the cache becomes a pass-through.
-
-| Variable | Notes |
-| --- | --- |
-| `REDIS_URL` | Everything in this section is disabled unless this is set |
-| `REDIS_KEY_PREFIX` | Prefixes every key. Set it when several environments share one instance |
-| `TRUSTED_PROXY_HOPS` | How many proxies sit in front of the server, for the client IP every rate limit keys on. `0` (the default) uses the socket address |
-
-Start the local container with:
-
-```bash
-pnpm run redis:start
-```
-
-The host port is **6666**, not Redis's default 6379 — the container-internal port is still 6379, which is why the compose-network `REDIS_URL` on the `server` service reads `redis://redis:6379`. Poke around a running instance with:
-
-```bash
-docker exec -it trumpet-pods-redis redis-cli
-```
-
-### Cache
-
-`createCache(namespace)` from `@trumpet-pods/redis` returns `get` / `set` / `del` / `remember`, all namespaced under `${namespace}:`:
+`mutationProcedure` wraps handlers in `db.transaction(...)`, so a side effect called directly from a handler (purging a cache key, notifying another system) runs before the transaction has committed and may act on a write that then rolls back. Queue it with `context.afterCommit(...)` instead (see its docblock in `packages/api/src/procedures.ts`):
 
 ```ts
-const orgCache = createCache("org");
-const org = await orgCache.remember(orgId, 60, () => loadOrg(orgId));
+createWidget: mutationProcedure.handler(async ({ context, input }) => {
+  const row = await context.db.insert(widget).values(/* ... */).returning();
+  context.afterCommit(() => notifySubscribers(row));
+  return row;
+}),
 ```
-
-Every method swallows Redis failures by design — a down or unreachable Redis degrades `get` to a miss, `set`/`del` to no-ops, and `remember` to calling `fn` directly. There is no stampede protection: concurrent callers that miss the same key all call `fn` and all write the result. Caching is an optimization here, not a dependency.
-
-Things that bite:
-
-- **Rate limiting falls back to process memory; only the cache fails open.** `countHit` counts in Redis when it answers and in an in-process fixed window when it is unset or a command fails, logging `ratelimit.fallback`. Nothing is rejected because Redis is down, so a Redis outage is not an outage for callers — but the limit never vanishes either ([ADR 0004](docs/adr/0004-fail-closed-security-limits.md)). The cost: the fallback is per process, so N replicas allow N times the limit, and a restart resets it. Alert on `redis.error` and `ratelimit.fallback`.
-- **Cache invalidation inside a mutation runs inside an open transaction.** `mutationProcedure` wraps handlers in `db.transaction(...)`, so a `cache.del()` called directly from a handler purges a key the transaction may still roll back. Use `context.afterCommit(...)` instead (see its docblock in `packages/api/src/procedures.ts`):
-
-  ```ts
-  createWidget: mutationProcedure.handler(async ({ context, input }) => {
-    const row = await context.db.insert(widget).values(/* ... */).returning();
-    context.afterCommit(() => cache.del("widgets"));
-    return row;
-  }),
-  ```
-
-- **`REDIS_KEY_PREFIX` is not test isolation.** Test workers each get their own numbered Redis logical database (`redis://…/N`, derived from `VITEST_POOL_ID`) and a `FLUSHDB` between tests. Never point the suite at a Redis you care about.
-
-## Feature flags
-
-Flags are _declared_ in code and _valued_ in the database, so turning one on is a row in `feature_flag` rather than a deploy. There is no admin UI: write the row directly. Declare one in `packages/env/src/flags.ts`:
-
-```ts
-export const featureFlagRegistry = {
-  FF__EXAMPLE: {
-    defaultEnabled: false,
-    description: "Example flag. Replace with a real one.",
-  },
-} as const satisfies Record<string, FeatureFlagDefinition>;
-```
-
-That is the whole setup — no migration, no seed, no env var. A flag with no row in `feature_flag` resolves to its `defaultEnabled`, and a row only exists once someone writes one.
-
-In a web component:
-
-```tsx
-const showExample = useFeatureFlag("FF__EXAMPLE");
-```
-
-On the server, read through the resolver in `@trumpet-pods/api/feature-flags` — it needs a `db` because the value lives in a table, and it is cached per process so this is a map lookup on all but one call in thirty:
-
-```ts
-import { isFeatureEnabled } from "@trumpet-pods/api/feature-flags";
-
-if (await isFeatureEnabled(context.db, "FF__EXAMPLE")) {
-  /* ... */
-}
-```
-
-`getFeatureFlags(db)` returns all of them at once, for a loop or a payload.
-
-To make a procedure unreachable rather than merely invisible:
-
-```ts
-newThing: publicProcedure
-  .use(requireFlag("FF__EXAMPLE"))
-  .handler(async ({ context }) => { /* ... */ }),
-```
-
-`requireFlag` needs only `db` from the context, which every procedure has, so it composes onto any of them. A flagged-off procedure answers `NOT_FOUND` rather than `FORBIDDEN`, since `FORBIDDEN` would confirm the endpoint exists.
-
-Names are typed against the registry: a typo is a compile error at a call site and a `BAD_REQUEST` at the API, not a silent `false`.
-
-Things to know:
-
-- **A toggle takes up to 30 seconds to reach every server.** Each process caches the table read for `FEATURE_FLAG_TTL_MS`; every process catches up within the TTL. The web client mirrors the same window, so an open tab picks a change up without a reload.
-- **Reading is public; there is no write endpoint.** `featureFlags.all` is a `publicProcedure`; values change by writing `feature_flag` rows directly.
-- **Adding a flag is still a deploy.** Only its value lives in the database. Declaring a flag is a code change on purpose: it is what keeps `FeatureFlagName` a typed union and `rg FF__EXAMPLE` a complete answer.
-- **Flags are global.** No per-user targeting and no percentage rollouts. If you need either, replace this with a real flag platform rather than extending it.
-- **Only declared flags are returned.** Reads walk the registry rather than returning whatever rows the table holds, so deleting a flag from code leaves an orphan row that nothing resurrects.
-- **Hiding UI is not gating.** `useFeatureFlag` only decides what renders; the procedure behind it stays callable by anyone who knows its name. Reach for `requireFlag` whenever the flag is protecting unreleased work rather than just tidying the UI.
-- **A flag read fails open to the last known values.** If the query fails, the resolver serves its cached values (or the declared defaults on a cold cache) and logs `featureflags.read.failed` rather than turning a degraded database into a 500 on every gated route.
 
 ## Project Structure
 
@@ -383,40 +289,32 @@ Things to know:
 trumpet-pods/
 ├── apps/
 │   ├── web/         # Frontend application (React + TanStack Router)
-│   ├── server/      # Backend API (Hono, ORPC)
-│   └── workers/     # pg-boss job consumer
+│   └── server/      # Backend API (Hono, ORPC)
 ├── packages/
 │   ├── ui/          # Shared coss ui components and styles
 │   ├── api/         # API layer / business logic
 │   ├── db/          # Database schema & queries
 │   ├── storage/     # S3-compatible object storage client
-│   ├── redis/       # Redis client, cache, and rate-limit primitives
 │   └── observability/ # evlog logging + PostHog drain
 ```
 
 ## Available Scripts
 
-- `pnpm run dev`: Start the infrastructure containers, then the web application, the server and the workers in an mprocs pane each. The container logs are available as a pane but do not start on their own
+- `pnpm run dev`: Start the infrastructure containers, then the web application and the server in an mprocs pane each. The container logs are available as a pane but do not start on their own
 - `pnpm run build`: Build all applications
 - `pnpm run dev:web`: Start only the web application
 - `pnpm run dev:server`: Start only the server
-- `pnpm run dev:workers`: Start only the background job workers
 - `pnpm run check-types`: Check TypeScript types across all apps
 - `pnpm run db:push`: Push schema changes to database (local iteration; use migrations for anything committed)
 - `pnpm run db:generate`: Generate a new migration from schema changes
 - `pnpm run db:migrate`: Run database migrations (structure only — use `db:deploy` for a working database)
-- `pnpm run db:deploy`: Run migrations, install the pg-boss schema, then any pending post-migration scripts
-- `pnpm run queue:migrate`: Apply pg-boss's own schema migrations (included in `db:deploy`)
+- `pnpm run db:deploy`: Run migrations, then any pending post-migration scripts
 - `pnpm run db:post-migrate`: Run pending post-migration scripts (see [Post-migration scripts](#post-migration-scripts))
 - `pnpm run db:post-migrate:status`: Show which post-migration scripts have run
 - `pnpm run db:post-migrate:new "<description>"`: Scaffold a new post-migration script
 - `pnpm run db:purge -- --yes`: **Destructive.** Drop every table and row for a clean local reset (see [`packages/db/src/dev-scripts/purge/README.md`](packages/db/src/dev-scripts/purge/README.md))
-- `pnpm run db:reset`: **Destructive.** Purge, `db:deploy` and seed — a fresh local database
+- `pnpm run db:reset`: **Destructive.** Purge, then `db:deploy` — a fresh local database
 - `pnpm run db:studio`: Open database studio UI
-- `pnpm run redis:start`: Start the local Redis container in the background
-- `pnpm run redis:watch`: Start the local Redis container attached, streaming logs
-- `pnpm run redis:stop`: Stop the local Redis container
-- `pnpm run redis:down`: Stop and remove the local Redis container
 - `pnpm run check`: Run Vite+ format/lint checks (types are `check-types`)
 - `pnpm run knip`: Report unused dependencies and exports
 - `pnpm run lint`: Run Vite+ lint checks

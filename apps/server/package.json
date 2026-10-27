@@ -30,8 +30,6 @@
     "@trumpet-pods/db": "workspace:*",
     "@trumpet-pods/env": "workspace:*",
     "@trumpet-pods/observability": "workspace:*",
-    "@trumpet-pods/queue": "workspace:*",
-    "@trumpet-pods/redis": "workspace:*",
     "@types/node": "catalog:",
     "@typescript/native": "catalog:",
     "tsdown": "catalog:",

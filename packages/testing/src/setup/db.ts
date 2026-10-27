@@ -1,6 +1,6 @@
 /**
- * Points `process.env.DATABASE_URL` / `REDIS_URL` at this worker's own Postgres
- * database and Redis logical database, before any "db" project test file loads
+ * Points `process.env.DATABASE_URL` at this worker's own Postgres database,
+ * before any "db" project test file loads
  * `@trumpet-pods/*`. Keep the static imports here limited to `pg`, `vite-plus/test` and
  * `./env`: static imports evaluate first, so anything reaching
  * `@trumpet-pods/env/shared-server` freezes its `env` against the dead placeholders for the
@@ -56,47 +56,22 @@ const workerUrl = new URL(base);
 workerUrl.pathname = `/${workerDbName}`;
 process.env.DATABASE_URL = workerUrl.toString();
 
-// One numbered Redis logical database per worker. Ids start at 1, so an
-// accidental default-database connection is obvious. Kept in sync with
-// setup/global-redis.ts by hand.
-const REDIS_TEST_DATABASES = 64;
-const poolId = Number(process.env.VITEST_POOL_ID ?? "1");
-if (!Number.isInteger(poolId) || poolId < 1 || poolId >= REDIS_TEST_DATABASES) {
-  throw new Error(
-    `VITEST_POOL_ID ${poolId} has no Redis logical database. The test container is ` +
-      `started with --databases ${REDIS_TEST_DATABASES} in setup/global-redis.ts; ` +
-      `raise that flag (in both places) or cap --maxWorkers.`
-  );
-}
-const redisWorkerUrl = new URL(inject("redisUri"));
-redisWorkerUrl.pathname = `/${poolId}`;
-process.env.REDIS_URL = redisWorkerUrl.toString();
-
 // Safe to touch `@trumpet-pods/*` only now — and only dynamically; see the file header.
 const { truncateAll, closeTestPool } = await import("../db");
-const { flushTestRedis, closeTestRedis } = await import("../redis");
 
-// Fail loudly if a static `@trumpet-pods/*` import creeps back in. Every Redis-backed
-// path fails open, so a frozen `undefined` REDIS_URL throws nothing — the suite
-// just goes green while covering nothing.
+// Fail loudly if a static `@trumpet-pods/*` import creeps back in: a frozen
+// DATABASE_URL points every test at the dead placeholder.
 const { env } = await import("@trumpet-pods/env/shared-server");
-if (
-  env.DATABASE_URL !== process.env.DATABASE_URL ||
-  env.REDIS_URL !== process.env.REDIS_URL
-) {
+if (env.DATABASE_URL !== process.env.DATABASE_URL) {
   throw new Error(
     `Module-load-ordering regression in packages/testing/src/setup/db.ts: frozen ` +
-      `env.DATABASE_URL (${JSON.stringify(env.DATABASE_URL)}) / env.REDIS_URL ` +
-      `(${JSON.stringify(env.REDIS_URL)}) does not match process.env ` +
-      `(${JSON.stringify(process.env.DATABASE_URL)} / ` +
-      `${JSON.stringify(process.env.REDIS_URL)}). Something in this file's module ` +
+      `env.DATABASE_URL (${JSON.stringify(env.DATABASE_URL)}) does not match ` +
+      `process.env (${JSON.stringify(process.env.DATABASE_URL)}). Something in this file's module ` +
       `graph reached @trumpet-pods/env/shared-server statically, before the assignments above. ` +
       `Make it a dynamic \`await import(...)\`.`
   );
 }
 
 beforeEach(truncateAll);
-beforeEach(flushTestRedis);
 
 afterAll(closeTestPool);
-afterAll(closeTestRedis);

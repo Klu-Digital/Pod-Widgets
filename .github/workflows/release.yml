@@ -49,8 +49,6 @@ jobs:
           - app: server
             dockerfile: apps/server/Dockerfile
             target: runner
-          - app: workers
-            dockerfile: apps/workers/Dockerfile
     env:
       # Read at step level to decide whether the source-map upload runs. A
       # job-level `if:` cannot see `secrets`, and a step-level `if:` cannot

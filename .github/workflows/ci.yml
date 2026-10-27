@@ -92,7 +92,7 @@ jobs:
   test-db:
     name: Database tests
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    # Boots postgres:18 and redis:8-alpine through testcontainers and runs
+    # Boots postgres:18 through testcontainers and runs
     # drizzle-kit migrate against the template database before the first test.
     timeout-minutes: 25
     steps:
@@ -114,7 +114,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-workspace
-      # `tsc --noEmit` type-checks apps/server and apps/workers but never bundles
+      # `tsc --noEmit` type-checks apps/server but never bundles
       # them, so a tsdown/rolldown failure would otherwise surface for the first
       # time in a Docker build.
       - run: pnpm build

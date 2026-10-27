@@ -53,8 +53,6 @@ services:
       NODE_ENV: production
       CORS_ORIGIN: ${PUBLIC_ORIGIN:?set in .env.vps}
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?set in .env.vps}@postgres:5432/trumpet-pods
-      # Caddy -> nginx -> server: one fewer and every caller shares Caddy's IP.
-      TRUSTED_PROXY_HOPS: 2
       # Inert until #18 wires uploads; empty values read as unset.
       S3_ENDPOINT: http://minio:9000
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-}
@@ -65,26 +63,6 @@ services:
       S3_FORCE_PATH_STYLE: "true"
     depends_on:
       postgres:
-        condition: service_healthy
-    restart: unless-stopped
-
-  workers:
-    build:
-      context: ..
-      dockerfile: apps/workers/Dockerfile
-    init: true
-    environment:
-      SERVICE_NAME: pod-widgets-vps-workers
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?set in .env.vps}@postgres:5432/trumpet-pods
-      S3_ENDPOINT: http://minio:9000
-      S3_BUCKET: ${S3_BUCKET:-}
-      S3_REGION: us-east-1
-      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-}
-      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-}
-      S3_FORCE_PATH_STYLE: "true"
-    depends_on:
-      # Healthy server = migrations and the pg-boss schema exist; the consumer's start() is fatal without them.
-      server:
         condition: service_healthy
     restart: unless-stopped
 

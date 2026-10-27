@@ -1,10 +1,8 @@
 import { ORPCError, os } from "@orpc/server";
-import type { FeatureFlagName } from "@trumpet-pods/env/flags";
 import { orpcLogger } from "@trumpet-pods/observability/orpc";
 import { z } from "zod";
 
 import type { Context } from "./context";
-import { isFeatureEnabled } from "./feature-flags/feature-flags.cache";
 import { domainErrors } from "./shared/errors";
 
 /**
@@ -114,25 +112,3 @@ export const identityMutationProcedure = publicProcedure
   .use(identity)
   .use(afterCommit)
   .use(transaction);
-
-/**
- * Read through the per-process flag cache, so this is a map lookup rather than
- * a query per call. Use it when a flag should make something unreachable — the
- * web app's `useFeatureFlag` is cosmetic, and the procedure stays callable by
- * anyone who knows its name.
- */
-export const requireFlag = (name: FeatureFlagName) =>
-  o.middleware(async ({ context, next }) => {
-    if (!(await isFeatureEnabled(context.db, name))) {
-      // NOT_FOUND, not FORBIDDEN: FORBIDDEN confirms the endpoint exists.
-      throw new ORPCError("NOT_FOUND");
-    }
-    return next();
-  });
-
-/**
- * Template primitive with no caller yet; see ./rate-limit.ts.
- *
- * @public
- */
-export { rateLimit } from "./rate-limit";

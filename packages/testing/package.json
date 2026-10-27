@@ -16,17 +16,13 @@
   "dependencies": {
     "@trumpet-pods/db": "workspace:*",
     "@trumpet-pods/env": "workspace:*",
-    "@trumpet-pods/queue": "workspace:*",
-    "ioredis": "catalog:",
-    "pg": "catalog:",
-    "pg-boss": "catalog:"
+    "pg": "catalog:"
   },
   "devDependencies": {
     "@testcontainers/postgresql": "^12.2.0",
     "@trumpet-pods/config": "workspace:*",
     "@types/pg": "^8.23.1",
     "@typescript/native": "catalog:",
-    "testcontainers": "^12.2.0",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }

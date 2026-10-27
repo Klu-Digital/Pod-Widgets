@@ -57,10 +57,8 @@ const main = async (): Promise<void> => {
       const db = createDb(pool);
       const schemaName = values.schema;
 
-      const queueSchema = env.PGBOSS_SCHEMA;
-
       console.log(
-        `Purging database: dropping and recreating "${schemaName}", "drizzle" and "${queueSchema}"...`
+        `Purging database: dropping and recreating "${schemaName}" and "drizzle"...`
       );
       await db.execute(
         sql`DROP SCHEMA IF EXISTS ${sql.identifier(schemaName)} CASCADE`
@@ -70,11 +68,6 @@ const main = async (): Promise<void> => {
       );
       await db.execute(sql`DROP SCHEMA IF EXISTS drizzle CASCADE`);
       await db.execute(sql`CREATE SCHEMA IF NOT EXISTS drizzle`);
-      // Dropped, not recreated — `pnpm queue:migrate` reinstalls it. Left behind,
-      // its jobs reference rows that no longer exist and fail one by one.
-      await db.execute(
-        sql`DROP SCHEMA IF EXISTS ${sql.identifier(queueSchema)} CASCADE`
-      );
       console.log("Done. Run `pnpm db:deploy` to rebuild the schema.");
 
       return 0;

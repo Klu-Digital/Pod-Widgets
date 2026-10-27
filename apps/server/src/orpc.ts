@@ -12,8 +12,6 @@ import type { EvlogVariables } from "@trumpet-pods/observability/hono";
 import type { Hono, MiddlewareHandler } from "hono";
 import { bodyLimit } from "hono/body-limit";
 
-import { clientIpOf } from "./client-ip";
-
 /** Every RPC input is small: file contents go straight to the bucket. */
 const RPC_MAX_BODY_BYTES = 1024 * 1024;
 
@@ -43,7 +41,7 @@ const mount = (
 ) => {
   const middleware: MiddlewareHandler<EvlogVariables> = async (c, next) => {
     const { matched, response } = await handler.handle(c.req.raw, {
-      context: await createContext({ context: c, ip: clientIpOf(c) }),
+      context: await createContext({ context: c }),
       prefix,
     });
 

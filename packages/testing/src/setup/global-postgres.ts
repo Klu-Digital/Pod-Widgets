@@ -10,11 +10,6 @@ const execFileAsync = promisify(execFile);
 /** Resolved relative to this file rather than hardcoded. */
 const dbPackageDir = fileURLToPath(new URL("../../../db", import.meta.url));
 
-/** Owns the `pg-boss` bin the schema install below runs. */
-const queuePackageDir = fileURLToPath(
-  new URL("../../../queue", import.meta.url)
-);
-
 /** Runs a pnpm command against the template, surfacing its output on failure. */
 const runInto = async (
   what: string,
@@ -49,8 +44,8 @@ declare module "vite-plus/test" {
 
 /**
  * Starts one postgres container per `vp test` invocation and brings it up the
- * way `pnpm db:deploy` does — drizzle migrations, pg-boss's schema, then
- * post-migration scripts — into a template database; `setup/db.ts` clones a
+ * way `pnpm db:deploy` does — drizzle migrations, then post-migration
+ * scripts — into a template database; `setup/db.ts` clones a
  * database off the template per worker.
  */
 export default async function setup(
@@ -73,18 +68,6 @@ export default async function setup(
     ["exec", "drizzle-kit", "migrate"],
     dbPackageDir,
     { DATABASE_URL: uri }
-  );
-
-  // Into the template, so every clone has it. On demand via `queue.start()` would
-  // race N workers to install the same schema, and production issues no DDL either.
-  await runInto(
-    "install the pg-boss schema into the postgres test template database",
-    ["exec", "pg-boss", "migrate"],
-    queuePackageDir,
-    {
-      PGBOSS_DATABASE_URL: uri,
-      PGBOSS_SCHEMA: process.env.PGBOSS_SCHEMA ?? "pgboss",
-    }
   );
 
   // Reference rows and backfills live in post-migration scripts, never in
