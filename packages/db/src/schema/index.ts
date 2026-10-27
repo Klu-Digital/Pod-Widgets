@@ -1,6 +1,5 @@
 // Explicit re-exports: drizzle needs the aggregate, but `export *` trips
 // `oxc/no-barrel-file`.
-export { featureFlag } from "./feature-flags";
 export { page } from "./pages";
 export {
   postMigration,

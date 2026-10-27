@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./flags": "./src/flags.ts",
     "./server": "./src/server.ts",
     "./shared-server": "./src/shared-server.ts",
     "./web": "./src/web.ts"

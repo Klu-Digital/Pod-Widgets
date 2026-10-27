@@ -1,5 +1,5 @@
 import { call } from "@orpc/server";
-import { featureFlag } from "@trumpet-pods/db/schema/feature-flags";
+import { page } from "@trumpet-pods/db/schema/pages";
 import { getTestDb } from "@trumpet-pods/testing";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vite-plus/test";
@@ -24,20 +24,22 @@ const writeThenQueue = (
   afterQueueing?: () => void
 ) =>
   mutationProcedure.handler(async ({ context: ctx }) => {
-    const name = `FF__${crypto.randomUUID()}`;
+    const title = crypto.randomUUID();
 
-    await ctx.db.insert(featureFlag).values({ enabled: true, name });
+    await ctx.db
+      .insert(page)
+      .values({ createdBy: "test", createdById: crypto.randomUUID(), title });
 
     ctx.afterCommit(async () => {
       const rows = await getTestDb()
         .select()
-        .from(featureFlag)
-        .where(eq(featureFlag.name, name));
+        .from(page)
+        .where(eq(page.title, title));
       report(rows.length === 1);
     });
 
     afterQueueing?.();
-    return { name };
+    return { title };
   });
 
 describe("afterCommit", () => {
@@ -73,7 +75,7 @@ describe("afterCommit", () => {
     ).rejects.toThrow("boom");
 
     expect(seen).toEqual([]);
-    expect(await getTestDb().select().from(featureFlag)).toHaveLength(0);
+    expect(await getTestDb().select().from(page)).toHaveLength(0);
   });
 
   it("does not fail the mutation when a queued task throws", async () => {
