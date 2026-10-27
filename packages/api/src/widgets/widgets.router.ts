@@ -12,7 +12,6 @@ import {
 import { listWidgets } from "./widgets.queries";
 
 const CONTENT_MAX_BYTES = 102_400;
-const ALT_MAX = 500;
 
 // Only the root is checked; the editor owns the rest of the schema.
 const contentSchema = z
@@ -32,11 +31,6 @@ const createSchema = z.discriminatedUnion("type", [
     pageId: z.uuid(),
     type: z.literal("banner"),
     variant: variantSchema,
-  }),
-  z.object({
-    alt: z.string().max(ALT_MAX).optional(),
-    pageId: z.uuid(),
-    type: z.literal("image"),
   }),
 ]);
 

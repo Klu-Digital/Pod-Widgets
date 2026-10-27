@@ -1,7 +1,6 @@
 import { page } from "@trumpet-pods/db/schema/pages";
 import {
   bannerWidget,
-  imageWidget,
   textWidget,
   widget,
   widgetAudit,
@@ -10,7 +9,7 @@ import type {
   BannerVariant,
   WidgetAuditAction,
 } from "@trumpet-pods/db/schema/widgets";
-import { and, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 
 import type { Actor, Executor } from "../shared/db";
 import { notFound } from "../shared/errors";
@@ -19,8 +18,7 @@ import type { Doc, WidgetView } from "./widgets.queries";
 
 export type NewWidget =
   | { type: "text" }
-  | { type: "banner"; variant: BannerVariant; content?: Doc }
-  | { type: "image"; alt?: string };
+  | { type: "banner"; variant: BannerVariant; content?: Doc };
 
 const audit = async (
   db: Executor,
@@ -75,7 +73,7 @@ export const createWidget = async (
   }
   const widgetId = created.id;
 
-  // An undefined `content` or `alt` falls through to the column default.
+  // An undefined `content` falls through to the column default.
   switch (input.type) {
     case "text": {
       await db.insert(textWidget).values({ widgetId });
@@ -87,10 +85,6 @@ export const createWidget = async (
         variant: input.variant,
         widgetId,
       });
-      break;
-    }
-    case "image": {
-      await db.insert(imageWidget).values({ alt: input.alt, widgetId });
       break;
     }
     default: {
@@ -111,9 +105,7 @@ export const updateWidgetContent = async (
   const [touched] = await db
     .update(widget)
     .set({ updatedAt: new Date() })
-    .where(
-      and(eq(widget.id, id), isNull(widget.deletedAt), ne(widget.type, "image"))
-    )
+    .where(and(eq(widget.id, id), isNull(widget.deletedAt)))
     .returning({ type: widget.type });
   if (!touched) {
     throw notFound("widget");

@@ -1,6 +1,5 @@
 import {
   bannerWidget,
-  imageWidget,
   textWidget,
   widget,
 } from "@trumpet-pods/db/schema/widgets";
@@ -28,21 +27,18 @@ export type WidgetView = WidgetBase &
   (
     | { type: "text"; content: Doc }
     | { type: "banner"; content: Doc; variant: BannerVariant }
-    | { type: "image"; alt: string; storageKey: string | null }
   );
 
 // `type` exists on the base and every sub-table, so columns are named.
 const selectWidgets = (db: Executor) =>
   db
     .select({
-      alt: imageWidget.alt,
       bannerContent: bannerWidget.content,
       createdAt: widget.createdAt,
       createdBy: widget.createdBy,
       createdById: widget.createdById,
       id: widget.id,
       pageId: widget.pageId,
-      storageKey: imageWidget.storageKey,
       textContent: textWidget.content,
       type: widget.type,
       updatedAt: widget.updatedAt,
@@ -50,8 +46,7 @@ const selectWidgets = (db: Executor) =>
     })
     .from(widget)
     .leftJoin(textWidget, eq(textWidget.widgetId, widget.id))
-    .leftJoin(bannerWidget, eq(bannerWidget.widgetId, widget.id))
-    .leftJoin(imageWidget, eq(imageWidget.widgetId, widget.id));
+    .leftJoin(bannerWidget, eq(bannerWidget.widgetId, widget.id));
 
 type WidgetRow = Awaited<ReturnType<typeof selectWidgets>>[number];
 
@@ -74,9 +69,6 @@ const toView = (row: WidgetRow): WidgetView => {
       type: "banner",
       variant: row.variant,
     };
-  }
-  if (row.type === "image" && row.alt !== null) {
-    return { ...base, alt: row.alt, storageKey: row.storageKey, type: "image" };
   }
   // The composite FK points sub-row to base, so a base row alone is possible.
   throw new Error(`widget ${row.id} has no ${row.type} row`);
