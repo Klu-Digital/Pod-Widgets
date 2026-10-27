@@ -23,7 +23,6 @@
     "@trumpet-pods/config": "workspace:*",
     "@types/pg": "^8.23.1",
     "@typescript/native": "catalog:",
-    "testcontainers": "^12.2.0",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }

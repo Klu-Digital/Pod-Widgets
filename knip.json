@@ -17,9 +17,6 @@
     "packages/api": {
       "includeEntryExports": true
     },
-    "packages/db": {
-      "ignoreDependencies": ["fishery"]
-    },
     "packages/storage": {
       "ignoreIssues": {
         "src/**": ["exports", "types"]

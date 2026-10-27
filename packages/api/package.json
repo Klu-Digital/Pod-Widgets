@@ -15,7 +15,6 @@
   "dependencies": {
     "@orpc/server": "catalog:",
     "@trumpet-pods/db": "workspace:*",
-    "@trumpet-pods/env": "workspace:*",
     "@trumpet-pods/observability": "workspace:*",
     "drizzle-orm": "catalog:",
     "zod": "catalog:"
