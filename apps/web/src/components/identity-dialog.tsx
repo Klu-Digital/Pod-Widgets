@@ -32,7 +32,7 @@ const NameForm = ({ onSaved }: { onSaved?: () => void }) => {
   };
 
   return (
-    <form onSubmit={submit}>
+    <>
       <DialogHeader>
         <DialogTitle>What should we call you?</DialogTitle>
         <DialogDescription>
@@ -40,23 +40,25 @@ const NameForm = ({ onSaved }: { onSaved?: () => void }) => {
         </DialogDescription>
       </DialogHeader>
       <DialogPanel>
-        <TextField
-          autoComplete="name"
-          autoFocus
-          error={error}
-          label="Your name"
-          maxLength={NAME_MAX_LENGTH}
-          onChange={(event) => {
-            setName(event.target.value);
-            setError(undefined);
-          }}
-          value={name}
-        />
+        <form onSubmit={submit}>
+          <TextField
+            autoComplete="name"
+            autoFocus
+            error={error}
+            label="Your name"
+            maxLength={NAME_MAX_LENGTH}
+            onChange={(event) => {
+              setName(event.target.value);
+              setError(undefined);
+            }}
+            value={name}
+          />
+        </form>
       </DialogPanel>
       <DialogFooter>
         <Button type="submit">Save</Button>
       </DialogFooter>
-    </form>
+    </>
   );
 };
 
