@@ -1,3 +1,4 @@
+import { Delete02Icon } from "@hugeicons/core-free-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RichTextEditor } from "@trumpet-pods/ui/components/rich-text-editor";
 import type { RichTextDoc } from "@trumpet-pods/ui/components/rich-text-editor";
@@ -7,7 +8,9 @@ import {
 } from "@trumpet-pods/ui/components/toggle-group";
 import { useState } from "react";
 
+import { IconButton } from "@/components/icon-button";
 import { WidgetFrame } from "@/components/widget-frame";
+import type { DeleteHandler, PendingSave } from "@/components/widgets/registry";
 import { useAutosave } from "@/hooks/use-autosave";
 import type { SaveStatus } from "@/hooks/use-autosave";
 import { orpc } from "@/utils/orpc";
@@ -36,9 +39,11 @@ const STATUS_LABEL: Record<SaveStatus, string> = {
 
 export const BannerWidget = ({
   autoFocus,
+  onDelete,
   widget,
 }: {
   autoFocus: boolean;
+  onDelete: DeleteHandler;
   widget: BannerWidgetData;
 }) => {
   const queryClient = useQueryClient();
@@ -75,7 +80,22 @@ export const BannerWidget = ({
   const { emoji } = VARIANTS[widget.variant];
 
   return (
-    <WidgetFrame aria-label="Banner widget" tone={widget.variant}>
+    <WidgetFrame
+      actions={
+        <IconButton
+          aria-label="Delete widget"
+          icon={Delete02Icon}
+          onClick={() =>
+            onDelete({
+              content: content as PendingSave["content"],
+              saved: flush(),
+            })
+          }
+        />
+      }
+      aria-label="Banner widget"
+      tone={widget.variant}
+    >
       <div className="mb-2 flex items-center justify-between gap-2">
         <span aria-hidden className="text-xl">
           {emoji}

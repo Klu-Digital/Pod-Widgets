@@ -24,7 +24,13 @@ export const WidgetByType = ({
 }) => {
   switch (widget.type) {
     case "banner": {
-      return <BannerWidget autoFocus={autoFocus} widget={widget} />;
+      return (
+        <BannerWidget
+          autoFocus={autoFocus}
+          onDelete={onDelete}
+          widget={widget}
+        />
+      );
     }
     case "text": {
       return (
