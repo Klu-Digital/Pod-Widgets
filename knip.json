@@ -1,0 +1,39 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": ["**/*.gen.ts", "**/dist/**"],
+  "ignoreUnresolved": ["./src/test/setup.ts"],
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/**/*.ts"],
+      "ignoreDependencies": ["rolldown"]
+    },
+    "apps/native": {
+      "ignore": ["**"]
+    },
+    "apps/web": {
+      "entry": ["src/**/*.test.{ts,tsx}"],
+      "ignoreDependencies": ["tailwindcss"],
+      "ignoreIssues": {
+        "src/routes/**": ["exports", "types"]
+      }
+    },
+    "packages/api": {
+      "includeEntryExports": true
+    },
+    "packages/auth": {
+      "includeEntryExports": true
+    },
+    "packages/db": {
+      "ignoreDependencies": ["fishery"]
+    },
+    "packages/queue": {
+      "includeEntryExports": true
+    },
+    "packages/storage": {
+      "includeEntryExports": true
+    },
+    "packages/ui": {
+      "ignoreDependencies": ["shadcn"]
+    }
+  }
+}

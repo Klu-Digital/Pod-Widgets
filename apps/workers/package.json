@@ -1,0 +1,36 @@
+{
+  "name": "workers",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsdown",
+    "check-types": "tsc --noEmit",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.mjs"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.3",
+    "@hono/prometheus": "catalog:",
+    "drizzle-orm": "catalog:",
+    "hono": "catalog:",
+    "prom-client": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@k22i/config": "workspace:*",
+    "@k22i/db": "workspace:*",
+    "@k22i/env": "workspace:*",
+    "@k22i/observability": "workspace:*",
+    "@k22i/queue": "workspace:*",
+    "@k22i/testing": "workspace:*",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
+    "tsdown": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

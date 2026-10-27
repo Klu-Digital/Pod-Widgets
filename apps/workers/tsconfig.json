@@ -1,0 +1,8 @@
+{
+  "extends": "@k22i/config/tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

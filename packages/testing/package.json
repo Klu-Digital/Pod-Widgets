@@ -1,0 +1,35 @@
+{
+  "name": "@k22i/testing",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "@k22i/auth": "workspace:*",
+    "@k22i/db": "workspace:*",
+    "@k22i/env": "workspace:*",
+    "@k22i/queue": "workspace:*",
+    "ioredis": "catalog:",
+    "pg": "catalog:",
+    "pg-boss": "catalog:"
+  },
+  "devDependencies": {
+    "@k22i/config": "workspace:*",
+    "@testcontainers/postgresql": "^12.2.0",
+    "@types/pg": "^8.23.1",
+    "@typescript/native": "catalog:",
+    "testcontainers": "^12.2.0",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

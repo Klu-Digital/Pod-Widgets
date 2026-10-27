@@ -1,0 +1,34 @@
+{
+  "name": "@k22i/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/procedures.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@k22i/auth": "workspace:*",
+    "@k22i/db": "workspace:*",
+    "@k22i/env": "workspace:*",
+    "@k22i/observability": "workspace:*",
+    "@k22i/queue": "workspace:*",
+    "@k22i/redis": "workspace:*",
+    "@k22i/storage": "workspace:*",
+    "@orpc/server": "catalog:",
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@k22i/config": "workspace:*",
+    "@typescript/native": "catalog:",
+    "hono": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
