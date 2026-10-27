@@ -158,21 +158,20 @@ export const formatPlan = (
 const trimSlash = (value: string): string => value.replace(/\/+$/u, "");
 
 export interface DerivedUrls {
-  BETTER_AUTH_URL: string;
   CORS_ORIGIN: string;
   SMOKE_URL: string;
 }
 
 /**
- * One URL answers all three in the deployed topology: nginx in the web image
- * proxies /api/auth and /rpc, so the API needs no public hostname of its own.
+ * One URL answers both in the deployed topology: nginx in the web image
+ * proxies /rpc, so the API needs no public hostname of its own.
  * `apiUrl` covers the split-hostname case. SMOKE_URL is the origin root because
  * that is the server's health route — apps/server/src/app.ts serves "OK" at "/".
  */
 export const deriveUrls = (webUrl: string, apiUrl?: string): DerivedUrls => {
   const web = trimSlash(webUrl);
   const api = apiUrl ? trimSlash(apiUrl) : web;
-  return { BETTER_AUTH_URL: api, CORS_ORIGIN: web, SMOKE_URL: api };
+  return { CORS_ORIGIN: web, SMOKE_URL: api };
 };
 
 export const formatDerivedUrls = (derived: DerivedUrls): string =>
@@ -180,8 +179,7 @@ export const formatDerivedUrls = (derived: DerivedUrls): string =>
     "",
     "Derived configuration:",
     "",
-    `  BETTER_AUTH_URL  ${derived.BETTER_AUTH_URL}`,
-    `  CORS_ORIGIN      ${derived.CORS_ORIGIN}`,
-    `  SMOKE_URL        ${derived.SMOKE_URL}`,
+    `  CORS_ORIGIN  ${derived.CORS_ORIGIN}`,
+    `  SMOKE_URL    ${derived.SMOKE_URL}`,
     "",
   ].join("\n");

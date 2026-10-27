@@ -8,14 +8,6 @@ export const env = createEnv({
   runtimeEnv: process.env,
   server: {
     ...sharedServerVariables,
-    /** Open self-service sign-up. Off: only the first account and invite-link holders. */
-    ALLOW_SIGNUP: z.stringbool().default(false),
-    /** better-auth defaults its rate limiter to production-only. */
-    AUTH_RATE_LIMIT_ENABLED: z.stringbool().optional(),
-    AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100),
-    AUTH_RATE_LIMIT_WINDOW: z.coerce.number().int().positive().default(10),
-    BETTER_AUTH_SECRET: z.string().min(32),
-    BETTER_AUTH_URL: z.url(),
     CORS_ORIGIN: z.url(),
     PORT: z.coerce.number().int().positive().default(1900),
     /**

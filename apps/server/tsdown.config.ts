@@ -30,12 +30,7 @@ export default defineConfig({
   deps: {
     alwaysBundle: [/@k22i\/.*/u],
   },
-  // The admin CLIs ride along because the runtime image has no tsx: they are
-  // the recovery path for a locked-out production admin.
   entry: {
-    "admin/grant": "../../packages/db/src/dev-scripts/grant-admin/cli.ts",
-    "admin/reset-password":
-      "../../packages/db/src/dev-scripts/reset-password/cli.ts",
     index: "./src/index.ts",
     start: "./src/start.ts",
   },

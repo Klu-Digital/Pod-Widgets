@@ -6,8 +6,6 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 
 - **TypeScript** - For type safety and improved developer experience
 - **TanStack Router** - File-based routing with full type safety
-- **React Native** - Build mobile apps using React
-- **Expo** - Tools for React Native development
 - **TailwindCSS** - Utility-first CSS for rapid UI development
 - **Shared UI package** - [coss ui](https://coss.com/ui) primitives live in `packages/ui`
 - **Hono** - Lightweight, performant server framework
@@ -15,7 +13,6 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **Node.js** - Runtime environment
 - **Drizzle** - TypeScript-first ORM
 - **PostgreSQL** - Database engine
-- **Authentication** - Better-Auth
 - **Oxlint** - Oxlint + Oxfmt (linting & formatting)
 - **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
 
@@ -51,7 +48,7 @@ The wizard asks provider by provider, decides for itself which values are GitHub
 pnpm rename my-app
 ```
 
-Renames the npm scope, the workspace packages, the Compose project and container names, the Postgres database, the Expo slug and deep-link scheme, and every mention in prose — reading the current name from the root `package.json`, so it stays re-runnable. Pass `--dry-run` first to see what it would touch. It refuses to run against a dirty working tree unless given `--force`, so that `git checkout .` is always an undo, and it prints any occurrence it could not safely rewrite (the name embedded in a camelCase identifier) rather than leaving it silently behind.
+Renames the npm scope, the workspace packages, the Compose project and container names, the Postgres database, and every mention in prose — reading the current name from the root `package.json`, so it stays re-runnable. Pass `--dry-run` first to see what it would touch. It refuses to run against a dirty working tree unless given `--force`, so that `git checkout .` is always an undo, and it prints any occurrence it could not safely rewrite (the name embedded in a camelCase identifier) rather than leaving it silently behind.
 
 ## Database Setup
 
@@ -74,7 +71,7 @@ Then, run the development server:
 pnpm run dev
 ```
 
-`pnpm run dev` brings up the infrastructure containers and then opens [mprocs](https://github.com/pvolok/mprocs), a small terminal UI that gives each process its own pane and its own scrollback rather than interleaving everything into one stream. `web`, `server` and `workers` start automatically; `native` and `infra` (container logs) are listed but idle — select one and press `s` to start it.
+`pnpm run dev` brings up the infrastructure containers and then opens [mprocs](https://github.com/pvolok/mprocs), a small terminal UI that gives each process its own pane and its own scrollback rather than interleaving everything into one stream. `web`, `server` and `workers` start automatically; `infra` (container logs) is listed but idle — select one and press `s` to start it.
 
 | Key |  |
 | --- | --- |
@@ -83,9 +80,9 @@ pnpm run dev
 | `s` / `x` / `r` | start / stop / restart the selected process |
 | `q` | quit everything |
 
-The panes are configured in [`mprocs.yaml`](mprocs.yaml). `C-a` is what lets you type into a process — that is how you reach Expo's keypress menu once `native` is running.
+The panes are configured in [`mprocs.yaml`](mprocs.yaml). `C-a` is what lets you type into a process.
 
-Open [http://localhost:2600](http://localhost:2600) in your browser to see the web application. The API is running at [http://localhost:1900](http://localhost:1900). For the mobile application, start the `native` pane and open it with the Expo Go app.
+Open [http://localhost:2600](http://localhost:2600) in your browser to see the web application. The API is running at [http://localhost:1900](http://localhost:1900).
 
 ### Ports
 
@@ -143,33 +140,33 @@ import { Button } from "@k22i/ui/components/button";
 A screen names itself once. `head()` on the route is the single source for both the document title and the breadcrumb trail — `AppBreadcrumbs` (`apps/web/src/components/app-breadcrumbs.tsx`) walks the matched routes and takes whichever `meta` entry carries a `title`.
 
 ```tsx
-export const Route = createFileRoute("/_auth/admin/users")({
+export const Route = createFileRoute("/_app/reports")({
   component: RouteComponent,
-  head: () => ({ meta: [{ title: "Users" }] }),
+  head: () => ({ meta: [{ title: "Reports" }] }),
 });
 ```
 
-That is the whole contract for a static screen. Nesting is implicit: `/admin` contributes "Admin", `/admin/users` contributes "Users", and the trail follows the route tree rather than a hand-maintained table of paths. A route that sets no title contributes no crumb, which is how pathless layouts like `_auth` stay out of the trail.
+That is the whole contract for a static screen. Nesting is implicit: `/reports` contributes "Reports", `/reports/$reportId` contributes its own title, and the trail follows the route tree rather than a hand-maintained table of paths. A route that sets no title contributes no crumb, which is how pathless layouts like `_app` stay out of the trail.
 
 A dynamic segment names itself from its data. `head()` runs after the loader and receives `loaderData`, so the crumb can say the record's name instead of the word "User":
 
 ```tsx
-export const Route = createFileRoute("/_auth/admin/users/$userId")({
+export const Route = createFileRoute("/_app/reports/$reportId")({
   component: RouteComponent,
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(
-      orpc.admin.users.detail.queryOptions({ input: { userId: params.userId } })
+      orpc.reports.detail.queryOptions({ input: { reportId: params.reportId } })
     ),
   head: ({ loaderData }) => ({
-    meta: [{ title: loaderData?.user?.name ?? "User" }],
+    meta: [{ title: loaderData?.name ?? "Report" }],
   }),
 });
 ```
 
 Things that bite:
 
-- **`loader` has to be written above `head`.** TypeScript resolves the route options object in source order, and with `head` first it has not yet inferred what the loader returns, so `loaderData` widens to `never` and every property access on it fails to compile. This is the one place in the codebase where route options are deliberately not key-sorted — both dynamic routes carry an `/* oxlint-disable sort-keys */` for it.
-- **Always give the fallback a sensible label.** An id that resolves to nothing still renders a crumb; `loaderData?.user?.name ?? "User"` is the difference between a generic trail and one reading "undefined".
+- **`loader` has to be written above `head`.** TypeScript resolves the route options object in source order, and with `head` first it has not yet inferred what the loader returns, so `loaderData` widens to `never` and every property access on it fails to compile. This is the one place in the codebase where route options are deliberately not key-sorted — a dynamic route carries an `/* oxlint-disable sort-keys */` for it.
+- **Always give the fallback a sensible label.** An id that resolves to nothing still renders a crumb; `loaderData?.name ?? "Report"` is the difference between a generic trail and one reading "undefined".
 - **The loader is what makes the crumb possible, not an extra request.** `ensureQueryData` seeds the same cache entry the component's `useQuery` reads, so the page costs one fetch. The real trade is timing: navigation now waits for the record before it paints rather than flashing a skeleton, which is deliberate — a breadcrumb that arrives a beat after the page is a layout shift in the header.
 - **The root route's title is the product name, not a crumb.** `__root.tsx` sets `title: "k22i"` as the fallback tab title; `AppBreadcrumbs` skips the root match so it never appears in the trail. Every child title overrides it in the tab.
 - **`staticData.crumb` is gone.** It could not express a dynamic crumb, and keeping both would mean two places to name a screen.
@@ -207,12 +204,12 @@ The web image serves the SPA through nginx using `apps/web/nginx.conf.template`,
 
 ### The web image is environment-agnostic
 
-`VITE_SERVER_URL` defaults to `/`, meaning "the origin that served this page". nginx forwards the two prefixes the API mounts — `/api/auth` and `/rpc` — to `SERVER_UPSTREAM`, plus `/health/ready` for an outside uptime monitor, so the browser only ever talks to one origin. Nothing environment-specific is inlined at build time, which is what lets a single built image be promoted from staging to production rather than rebuilt per environment. `apps/web/vite.config.ts` proxies the same two prefixes so `pnpm dev` runs the same topology.
+`VITE_SERVER_URL` defaults to `/`, meaning "the origin that served this page". nginx forwards `/rpc` to `SERVER_UPSTREAM`, plus `/health/ready` for an outside uptime monitor, so the browser only ever talks to one origin. Nothing environment-specific is inlined at build time, which is what lets a single built image be promoted from staging to production rather than rebuilt per environment. `apps/web/vite.config.ts` proxies the same prefix so `pnpm dev` runs the same topology.
 
 Three consequences worth knowing:
 
 - **The API needs no public hostname.** It is reachable only through the web origin. `/api-reference` and the Prometheus metrics path are deliberately _not_ proxied, so they stay private, and `/api-reference` is not mounted at all when `NODE_ENV=production`.
-- **Set `TRUSTED_PROXY_HOPS` to the number of proxies in front of the server** — `1` for the web image's nginx alone, `2` with Traefik or a load balancer in front of that. The server resolves the client IP once per request, counting that many `x-forwarded-for` entries from the right, and hands it to both the oRPC `rateLimit()` middleware and better-auth. Left at `0` behind a proxy, every caller is identified by the proxy's address. See [apps/server/README.md](apps/server/README.md#client-ip-and-trusted_proxy_hops).
+- **Set `TRUSTED_PROXY_HOPS` to the number of proxies in front of the server** — `1` for the web image's nginx alone, `2` with Traefik or a load balancer in front of that. The server resolves the client IP once per request, counting that many `x-forwarded-for` entries from the right, and hands it to the oRPC `rateLimit()` middleware. Left at `0` behind a proxy, every caller is identified by the proxy's address. See [apps/server/README.md](apps/server/README.md#client-ip-and-trusted_proxy_hops).
 - **`SERVER_UPSTREAM` goes through a resolver on purpose.** A hostname written literally into `proxy_pass` is resolved once at nginx startup and cached for the process's life, so recreating the API container would leave nginx posting at an address nothing answers on. The variable-plus-`resolver` form re-resolves per request.
 
 For more details, see the guide on [Deploying with Docker Compose](https://www.better-t-stack.dev/docs/guides/docker).
@@ -230,7 +227,7 @@ Both tiers set their own, because they serve different things and a header that 
 
 Two departures from Hono's defaults are worth knowing:
 
-- **`Cross-Origin-Resource-Policy` is `cross-origin`, not the default `same-origin`.** This server exists to be read from another origin — the web app on `CORS_ORIGIN`, the Expo app on a custom scheme. Leaving the default would be a same-origin restriction sitting directly behind a CORS config that exists to allow the opposite.
+- **`Cross-Origin-Resource-Policy` is `cross-origin`, not the default `same-origin`.** This server exists to be read from another origin — the web app on `CORS_ORIGIN`. Leaving the default would be a same-origin restriction sitting directly behind a CORS config that exists to allow the opposite.
 - **`X-Frame-Options` is `DENY` rather than `SAMEORIGIN`.** Nothing here is ever meant to be framed, including by itself.
 
 `Strict-Transport-Security` keeps Hono's default. Browsers ignore it entirely over plain HTTP, so it costs local development nothing and needs no `NODE_ENV` branch.
@@ -244,15 +241,9 @@ Two things that bite:
 
 nginx sends the same `Strict-Transport-Security` value as the API (`max-age=15552000; includeSubDomains`), so the origin has one policy whether a response came from nginx or was proxied. Mind `includeSubDomains` before serving on an apex domain whose subdomains are not all on HTTPS: it is slow and painful to undo.
 
-### Session cookie attributes
+### CSRF
 
-`defaultCookieAttributes` in `packages/auth/src/index.ts` answers two independent questions, and keeping them independent is the point.
-
-`Secure` follows **deployment**: on in `production` and `staging`, off everywhere else. `SameSite` follows **topology**: it compares the sites of `BETTER_AUTH_URL` and `CORS_ORIGIN` and answers `Lax` when they match, `None` only when they genuinely differ and the environment is deployed. Under the default same-origin setup that means `SameSite=Lax; Secure` in production — the tighter pair, with CSRF protection the cross-site version gives up. Split the API back onto its own host and it returns `None` on its own, no code change. `/rpc` does not lean on `SameSite` alone: oRPC's `SimpleCsrfProtectionHandlerPlugin` refuses any call without an `x-csrf-token` header, which a cross-site page can only send after a CORS preflight that `CORS_ORIGIN` refuses. Every `RPCLink` — web, native and tests — needs `SimpleCsrfProtectionLinkPlugin`.
-
-Deriving both from one flag, as this did before, is the trap: the day the topology becomes same-site in production is the day the cookie also stops being `Secure`. `None` without `Secure` is illegal anyway, so the two must move separately.
-
-Sending `None; Secure` everywhere appears to work locally because Chrome and Firefox special-case `http://localhost` and accept `Secure` cookies over it. Safari does not, and neither extends that exception to a dev server reached over a LAN IP — the usual way to open the web app on a real phone. The failure is silent: the cookie is dropped and every request looks signed out. Note that a port is not part of a _site_, so `localhost:2600` and `localhost:1900` are same-site regardless.
+`/rpc` requires an `x-csrf-token` header: oRPC's `SimpleCsrfProtectionHandlerPlugin` refuses any call without it, which a cross-site page can only send after a CORS preflight that `CORS_ORIGIN` refuses. Every `RPCLink` — web and tests — needs `SimpleCsrfProtectionLinkPlugin`.
 
 ## Object storage
 
@@ -285,15 +276,12 @@ Two things that bite:
 
 ## Redis
 
-Redis backs three things: better-auth's own rate limiter, an oRPC `rateLimit()` middleware for our own procedures, and a `createCache()` primitive used at call sites throughout the API. It is **optional** — with `REDIS_URL` unset the server boots exactly as before: every rate limit counts in process memory instead, and the cache becomes a pass-through. Sessions are deliberately **not** in Redis; see the second item under "Five things that bite" below.
+Redis backs two things: an oRPC `rateLimit()` middleware for our own procedures, and a `createCache()` primitive used at call sites throughout the API. It is **optional** — with `REDIS_URL` unset the server boots exactly as before: every rate limit counts in process memory instead, and the cache becomes a pass-through.
 
 | Variable | Notes |
 | --- | --- |
 | `REDIS_URL` | Everything in this section is disabled unless this is set |
 | `REDIS_KEY_PREFIX` | Prefixes every key. Set it when several environments share one instance |
-| `AUTH_RATE_LIMIT_ENABLED` | better-auth's own default is production-only; this opts in or out explicitly |
-| `AUTH_RATE_LIMIT_WINDOW` | Seconds. Defaults to `10` |
-| `AUTH_RATE_LIMIT_MAX` | Defaults to `100` |
 | `TRUSTED_PROXY_HOPS` | How many proxies sit in front of the server, for the client IP every rate limit keys on. `0` (the default) uses the socket address |
 
 Start the local container with:
@@ -319,17 +307,15 @@ const org = await orgCache.remember(orgId, 60, () => loadOrg(orgId));
 
 Every method swallows Redis failures by design — a down or unreachable Redis degrades `get` to a miss, `set`/`del` to no-ops, and `remember` to calling `fn` directly. There is no stampede protection: concurrent callers that miss the same key all call `fn` and all write the result. Caching is an optimization here, not a dependency.
 
-Five things that bite:
+Things that bite:
 
-- **The client IP comes from the server, not from better-auth.** better-auth is handed a `Request`, so it can never see the socket, and its own `x-forwarded-for` parsing disagrees with ours: it rejects any chain longer than one entry and then buckets _every_ caller under one shared `no-trusted-ip` key. So the server stamps the address it resolved on the request as `x-k22i-client-ip`, overwriting any copy the caller sent, and `advanced.ipAddress.ipAddressHeaders` points better-auth at that header alone. Calling `auth.handler` without `withClientIp` from `@k22i/auth/client-ip` brings the shared bucket back.
-- **Rate limiting falls back to process memory; only the cache fails open.** `countHit` counts in Redis when it answers and in an in-process fixed window when it is unset or a command fails, logging `ratelimit.fallback`. Nothing is rejected because Redis is down, so a Redis outage is not an auth outage — but the limit never vanishes either ([ADR 0004](docs/adr/0004-fail-closed-security-limits.md)). The cost: the fallback is per process, so N replicas allow N times the limit, and a restart resets it. Alert on `redis.error` and `ratelimit.fallback`.
-- **Sessions are deliberately not in Redis.** better-auth's `secondaryStorage` is a _different_ option from `rateLimit.customStorage`, and turning it on stops better-auth from writing the Postgres `session` row at all — which breaks the `activeOrganizationId` repair in `packages/auth/src/index.ts`'s `user.create.after` hook and 403s every newly signed-up user out of `requireOrganization`. If you want to cut the per-request session query in `packages/api/src/context.ts`, evaluate better-auth's `session.cookieCache`, not `secondaryStorage`. `packages/auth/src/personal-organization.db.test.ts` is the regression test that catches this if it regresses.
+- **Rate limiting falls back to process memory; only the cache fails open.** `countHit` counts in Redis when it answers and in an in-process fixed window when it is unset or a command fails, logging `ratelimit.fallback`. Nothing is rejected because Redis is down, so a Redis outage is not an outage for callers — but the limit never vanishes either ([ADR 0004](docs/adr/0004-fail-closed-security-limits.md)). The cost: the fallback is per process, so N replicas allow N times the limit, and a restart resets it. Alert on `redis.error` and `ratelimit.fallback`.
 - **Cache invalidation inside a mutation runs inside an open transaction.** `mutationProcedure` wraps handlers in `db.transaction(...)`, so a `cache.del()` called directly from a handler purges a key the transaction may still roll back. Use `context.afterCommit(...)` instead (see its docblock in `packages/api/src/procedures.ts`):
 
   ```ts
-  createUpload: mutationProcedure.handler(async ({ context, input }) => {
-    const row = await context.db.insert(file).values(/* ... */).returning();
-    context.afterCommit(() => cache.del(`org:${context.organizationId}:files`));
+  createWidget: mutationProcedure.handler(async ({ context, input }) => {
+    const row = await context.db.insert(widget).values(/* ... */).returning();
+    context.afterCommit(() => cache.del("widgets"));
     return row;
   }),
   ```
@@ -338,7 +324,7 @@ Five things that bite:
 
 ## Feature flags
 
-Flags are _declared_ in code and _valued_ in the database, so turning one on is a click at `/admin/flags` rather than a deploy. Declare one in `packages/env/src/flags.ts`:
+Flags are _declared_ in code and _valued_ in the database, so turning one on is a row in `feature_flag` rather than a deploy. There is no admin UI: write the row directly. Declare one in `packages/env/src/flags.ts`:
 
 ```ts
 export const featureFlagRegistry = {
@@ -349,9 +335,9 @@ export const featureFlagRegistry = {
 } as const satisfies Record<string, FeatureFlagDefinition>;
 ```
 
-That is the whole setup — no migration, no seed, no env var. A flag with no row in `feature_flag` resolves to its `defaultEnabled`, and a row appears the first time an admin toggles it.
+That is the whole setup — no migration, no seed, no env var. A flag with no row in `feature_flag` resolves to its `defaultEnabled`, and a row only exists once someone writes one.
 
-In an authenticated web route:
+In a web component:
 
 ```tsx
 const showExample = useFeatureFlag("FF__EXAMPLE");
@@ -372,56 +358,24 @@ if (await isFeatureEnabled(context.db, "FF__EXAMPLE")) {
 To make a procedure unreachable rather than merely invisible:
 
 ```ts
-newThing: protectedProcedure
+newThing: publicProcedure
   .use(requireFlag("FF__EXAMPLE"))
   .handler(async ({ context }) => { /* ... */ }),
 ```
 
-`requireFlag` needs only `db` from the context, which every rung has, so it composes onto any procedure — public, protected, or org-scoped. A flagged-off procedure answers `NOT_FOUND` rather than `FORBIDDEN`, since `FORBIDDEN` would confirm the endpoint exists.
+`requireFlag` needs only `db` from the context, which every procedure has, so it composes onto any of them. A flagged-off procedure answers `NOT_FOUND` rather than `FORBIDDEN`, since `FORBIDDEN` would confirm the endpoint exists.
 
 Names are typed against the registry: a typo is a compile error at a call site and a `BAD_REQUEST` at the API, not a silent `false`.
 
 Things to know:
 
-- **A toggle takes up to 30 seconds to reach every server.** Each process caches the table read for `FEATURE_FLAG_TTL_MS`; the instance that handled the toggle invalidates its own cache once the transaction commits, the rest catch up within the TTL. The web client mirrors the same window, so an open tab picks a change up without a reload.
-- **Reading is for anyone signed in; writing is platform-admin only.** `featureFlags.all` is a `protectedProcedure` — the web app needs it to decide what to render — while `admin.featureFlags.set` / `.reset` sit behind `adminMutationProcedure` on the global `user.role`.
-- **Adding a flag is still a deploy.** Only its value moved to the database. Declaring a flag is a code change on purpose: it is what keeps `FeatureFlagName` a typed union and `rg FF__EXAMPLE` a complete answer.
+- **A toggle takes up to 30 seconds to reach every server.** Each process caches the table read for `FEATURE_FLAG_TTL_MS`; every process catches up within the TTL. The web client mirrors the same window, so an open tab picks a change up without a reload.
+- **Reading is public; there is no write endpoint.** `featureFlags.all` is a `publicProcedure`; values change by writing `feature_flag` rows directly.
+- **Adding a flag is still a deploy.** Only its value lives in the database. Declaring a flag is a code change on purpose: it is what keeps `FeatureFlagName` a typed union and `rg FF__EXAMPLE` a complete answer.
 - **Flags are global.** No per-user targeting and no percentage rollouts. If you need either, replace this with a real flag platform rather than extending it.
-- **`useFeatureFlag` only works signed in.** `featureFlags.all` is a `protectedProcedure`, so calling the hook outside `src/routes/_auth/*` fails with `UNAUTHORIZED` and toasts at the user.
 - **Only declared flags are returned.** Reads walk the registry rather than returning whatever rows the table holds, so deleting a flag from code leaves an orphan row that nothing resurrects.
 - **Hiding UI is not gating.** `useFeatureFlag` only decides what renders; the procedure behind it stays callable by anyone who knows its name. Reach for `requireFlag` whenever the flag is protecting unreleased work rather than just tidying the UI.
-- **Auth is checked before the flag.** On `protectedProcedure.use(requireFlag(...))` a signed-out caller gets `UNAUTHORIZED`, never `NOT_FOUND`, so an anonymous probe cannot tell a flagged-off procedure from a flagged-on one.
 - **A flag read fails open to the last known values.** If the query fails, the resolver serves its cached values (or the declared defaults on a cold cache) and logs `featureflags.read.failed` rather than turning a degraded database into a 500 on every gated route.
-
-## Authorization (RBAC)
-
-Roles are defined once in `packages/auth/src/permissions.ts` and enforced as a rung on the oRPC procedure ladder:
-
-```ts
-listInvoices: orgProcedure
-  .use(requirePermission({ invoice: ["read"] }))
-  .handler(async ({ context }) => { /* ... */ }),
-```
-
-This is better-auth's `access` module rather than a hand-rolled permissions schema, so there are **no role tables and no migration** — `member.role` already exists, and roles are typed data that the web and native clients import unchanged.
-
-Things to know:
-
-- **Two role columns, two meanings.** `member.role` is per-organization and is what `requirePermission` reads; `user.role` (from the `admin()` plugin) is global and is for your own back-office powers. Product permissions belong on the first.
-- **Checks are ANDed and fail closed.** `requirePermission({})` denies everyone, owners included.
-- **Role changes take effect immediately.** The caller's role is read per request in `requireOrganization`, not baked into the session.
-- **Everyone is `owner` of their personal organization**, so the default single-user experience is unchanged by any of this.
-
-Full guide, including the ownership (`:any`) convention and how to add a resource: [`packages/auth/README.md`](packages/auth/README.md).
-
-## Accounts, recovery and invitations
-
-The template **sends no email** ([ADR 0001](docs/adr/0001-no-email-admin-driven-recovery.md)). Recovery is admin-driven, with shell access to the server as the root of trust.
-
-- **Sign-up is closed by default.** The first account on an empty database bootstraps the instance and becomes platform admin; after that only a holder of an invite link can create an account. `ALLOW_SIGNUP=true` opens it. Server-side `auth.api.signUpEmail` calls (the seeder, `signUpTestUser`) bypass the gate.
-- **Invitations are bearer links.** The invitation's email is only a label: the inviter copies the link from organization settings and sends it, and `invitations.accept` in `@k22i/api` admits whoever holds it. better-auth's own email-matched invitation endpoints answer 404.
-- **A platform admin resets passwords** from `/admin/users/<id>`, which creates a one-time link valid for 24 hours to hand over out of band. **A locked-out lone admin** runs `pnpm admin:reset-password <email>`, locally or inside the server container. Both sign the user out everywhere.
-- **Forgot password** still works as a fallback for whoever runs the server: the link is written to raw stdout via `deliver()` in `packages/auth/src/deliver.ts` — the one place SMTP would slot in — never to the structured logger, which drains to PostHog.
 
 ## Project Structure
 
@@ -429,13 +383,11 @@ The template **sends no email** ([ADR 0001](docs/adr/0001-no-email-admin-driven-
 k22i/
 ├── apps/
 │   ├── web/         # Frontend application (React + TanStack Router)
-│   ├── native/      # Mobile application (React Native, Expo)
 │   ├── server/      # Backend API (Hono, ORPC)
 │   └── workers/     # pg-boss job consumer
 ├── packages/
 │   ├── ui/          # Shared coss ui components and styles
 │   ├── api/         # API layer / business logic
-│   ├── auth/        # Authentication configuration & logic
 │   ├── db/          # Database schema & queries
 │   ├── storage/     # S3-compatible object storage client
 │   ├── redis/       # Redis client, cache, and rate-limit primitives
@@ -444,13 +396,12 @@ k22i/
 
 ## Available Scripts
 
-- `pnpm run dev`: Start the infrastructure containers, then the web application, the server and the workers in an mprocs pane each. The native app and the container logs are available as panes but do not start on their own
+- `pnpm run dev`: Start the infrastructure containers, then the web application, the server and the workers in an mprocs pane each. The container logs are available as a pane but do not start on their own
 - `pnpm run build`: Build all applications
 - `pnpm run dev:web`: Start only the web application
 - `pnpm run dev:server`: Start only the server
 - `pnpm run dev:workers`: Start only the background job workers
 - `pnpm run check-types`: Check TypeScript types across all apps
-- `pnpm run dev:native`: Start the React Native/Expo development server
 - `pnpm run db:push`: Push schema changes to database (local iteration; use migrations for anything committed)
 - `pnpm run db:generate`: Generate a new migration from schema changes
 - `pnpm run db:migrate`: Run database migrations (structure only — use `db:deploy` for a working database)
@@ -462,8 +413,6 @@ k22i/
 - `pnpm run db:purge -- --yes`: **Destructive.** Drop every table and row for a clean local reset (see [`packages/db/src/dev-scripts/purge/README.md`](packages/db/src/dev-scripts/purge/README.md))
 - `pnpm run db:reset`: **Destructive.** Purge, `db:deploy` and seed — a fresh local database
 - `pnpm run db:studio`: Open database studio UI
-- `pnpm run admin:grant <email>`: Make an existing account platform admin
-- `pnpm run admin:reset-password <email>`: Set a new password and sign the account out everywhere (the recovery path for a locked-out admin)
 - `pnpm run redis:start`: Start the local Redis container in the background
 - `pnpm run redis:watch`: Start the local Redis container attached, streaming logs
 - `pnpm run redis:stop`: Stop the local Redis container

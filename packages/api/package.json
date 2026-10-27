@@ -13,13 +13,11 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@k22i/auth": "workspace:*",
     "@k22i/db": "workspace:*",
     "@k22i/env": "workspace:*",
     "@k22i/observability": "workspace:*",
     "@k22i/queue": "workspace:*",
     "@k22i/redis": "workspace:*",
-    "@k22i/storage": "workspace:*",
     "@orpc/server": "catalog:",
     "drizzle-orm": "catalog:",
     "zod": "catalog:"

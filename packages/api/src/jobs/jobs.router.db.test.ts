@@ -1,9 +1,7 @@
 import { queue } from "@k22i/queue";
 import {
   getQueuedJobs,
-  getSessionFor,
   getTestDb,
-  signUpTestUser,
   startTestQueue,
   stopTestQueue,
 } from "@k22i/testing";
@@ -21,13 +19,7 @@ import { appRouter } from "../routers/index";
 beforeAll(startTestQueue);
 afterAll(stopTestQueue);
 
-const contextFor = async (headers: Headers): Promise<Context> =>
-  ({
-    auth: null,
-    db: getTestDb(),
-    log: undefined,
-    session: await getSessionFor(headers),
-  }) as unknown as Context;
+const context = { db: getTestDb(), log: undefined } as unknown as Context;
 
 describe("transactional enqueue", () => {
   it("keeps the job when the surrounding transaction commits", async () => {
@@ -67,9 +59,6 @@ describe("transactional enqueue", () => {
 
 describe("jobs.enqueueExample", () => {
   it("enqueues through the router on the request's own transaction", async () => {
-    const { headers } = await signUpTestUser();
-    const context = await contextFor(headers);
-
     const result = await call(
       appRouter.jobs.enqueueExample,
       { message: "via orpc" },

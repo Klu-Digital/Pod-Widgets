@@ -27,10 +27,9 @@ export default defineConfig({
   server: {
     port,
     // Puts `pnpm dev` on a deployed stack's topology — same-origin SPA, a proxy
-    // forwarding the API prefixes — so CORS and cookie problems do not wait
-    // until staging to show up.
+    // forwarding the API prefix — so CORS problems do not wait until
+    // staging to show up.
     proxy: {
-      "/api/auth": { target: apiTarget },
       "/rpc": { target: apiTarget },
     },
   },

@@ -15,21 +15,16 @@
     "@hugeicons/core-free-icons": "catalog:",
     "@hugeicons/react": "catalog:",
     "@k22i/api": "workspace:*",
-    "@k22i/auth": "workspace:*",
     "@k22i/env": "workspace:*",
-    "@k22i/storage": "workspace:*",
     "@k22i/ui": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/tanstack-query": "catalog:",
     "@tailwindcss/vite": "^4.3.3",
-    "@tanstack/react-form": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "^1.170.41",
-    "better-auth": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:",
-    "zod": "catalog:"
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@k22i/config": "workspace:*",

@@ -269,10 +269,10 @@ describe("Dokploy adapter", () => {
     ];
 
     await applyDokploy(
-      planWrites(["BETTER_AUTH_SECRET"], "staging", emptyRemoteState()),
+      planWrites(["DATABASE_URL"], "staging", emptyRemoteState()),
       {
-        order: ["BETTER_AUTH_SECRET"],
-        values: new Map([["BETTER_AUTH_SECRET", CANARY]]),
+        order: ["DATABASE_URL"],
+        values: new Map([["DATABASE_URL", CANARY]]),
       },
       client,
       applications
@@ -283,11 +283,11 @@ describe("Dokploy adapter", () => {
       env: string;
     };
     expect(body.env).toContain("EXISTING=keep-me");
-    expect(body.env).toContain(`BETTER_AUTH_SECRET=${CANARY}`);
-    expect(applications[0]?.state.names.has("BETTER_AUTH_SECRET")).toBe(true);
+    expect(body.env).toContain(`DATABASE_URL=${CANARY}`);
+    expect(applications[0]?.state.names.has("DATABASE_URL")).toBe(true);
   });
 
-  it("does not send a server-only secret to the workers application", async () => {
+  it("does not send a server-only value to the workers application", async () => {
     respond({});
     const client = createDokployClient("https://dokploy.example.com", "token");
     const workers = {
@@ -297,16 +297,16 @@ describe("Dokploy adapter", () => {
     };
 
     await applyDokploy(
-      planWrites(["BETTER_AUTH_SECRET"], "staging", emptyRemoteState()),
+      planWrites(["CORS_ORIGIN"], "staging", emptyRemoteState()),
       {
-        order: ["BETTER_AUTH_SECRET"],
-        values: new Map([["BETTER_AUTH_SECRET", CANARY]]),
+        order: ["CORS_ORIGIN"],
+        values: new Map([["CORS_ORIGIN", CANARY]]),
       },
       client,
       [workers]
     );
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(workers.state.names.has("BETTER_AUTH_SECRET")).toBe(false);
+    expect(workers.state.names.has("CORS_ORIGIN")).toBe(false);
   });
 });

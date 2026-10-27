@@ -10,7 +10,6 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { ThemeProvider } from "@/components/theme-provider";
-import { sessionQueryOptions } from "@/lib/session";
 import type { orpc } from "@/utils/orpc";
 
 import "../index.css";
@@ -53,18 +52,6 @@ const RootErrorComponent = ({ reset }: { reset: () => void }) => (
 );
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
-  /**
-   * Resolved once here: three guards need this answer on a single navigation.
-   */
-  beforeLoad: async ({ context }) => ({
-    session: await context.queryClient.ensureQueryData({
-      ...sessionQueryOptions(),
-      // `ensureQueryData` is cache-first and never revalidates, so without this
-      // a session revoked elsewhere would keep waving people through until the
-      // entry was garbage collected.
-      revalidateIfStale: true,
-    }),
-  }),
   component: RootComponent,
   errorComponent: RootErrorComponent,
   head: () => ({

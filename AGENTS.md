@@ -1,30 +1,28 @@
 # AGENTS.md
 
-A fullstack TypeScript template: React/TanStack Router web, Expo native, Hono + oRPC API, background workers, Postgres/Drizzle, better-auth. pnpm workspace, `@k22i/*` package scope. `pnpm rename <new-name>` rewrites the scope, the Compose project, the database and the Expo slug for a new project. It sends no email. The reasoning behind the decisions that surprise people is in [docs/adr/](docs/adr/).
+A fullstack TypeScript template: React/TanStack Router web, Hono + oRPC API, background workers, Postgres/Drizzle. There is no auth: the app is public and single-tenant. pnpm workspace, `@k22i/*` package scope. `pnpm rename <new-name>` rewrites the scope, the Compose project and the database for a new project. It sends no email. The reasoning behind the decisions that surprise people is in [docs/adr/](docs/adr/).
 
 ## Layout
 
 ```
 apps/web       React SPA (TanStack Router, Tailwind, coss ui via packages/ui)
-apps/native    Expo app
-apps/server    Hono HTTP server — mounts auth, oRPC, metrics. Queue PRODUCER only
+apps/server    Hono HTTP server — mounts oRPC, metrics. Queue PRODUCER only
 apps/workers   pg-boss consumer — runs jobs, cron, queue maintenance
-packages/api   oRPC procedure ladder, middleware, routers. The business logic
-packages/auth  better-auth config, RBAC role definitions
+packages/api   oRPC procedures, middleware, routers. The business logic
 packages/db    Drizzle schema, migrations, post-migration scripts, dev scripts
-packages/env   Validated env schemas (server/web/native) + the feature-flag registry
+packages/env   Validated env schemas (server/web) + the feature-flag registry
 packages/queue Typed pg-boss job registry
 packages/redis Client, cache, rate-limit primitives — all optional
 packages/storage        S3-compatible presigned uploads
 packages/observability  evlog logging + PostHog drain
-packages/testing        Test harness: db, redis, queue, auth helpers
+packages/testing        Test harness: db, redis, queue helpers
 packages/ui    Shared coss ui primitives (Base UI + Tailwind)
 ```
 
 ## Commands
 
 ```bash
-pnpm dev                # everything; also dev:web / dev:server / dev:workers / dev:native
+pnpm dev                # everything; also dev:web / dev:server / dev:workers
 pnpm check              # ultracite check — oxlint + oxfmt with the Ultracite preset
 pnpm fix                # ultracite fix — autofix lint + format (pre-commit runs this on staged files)
 pnpm check-types        # tsc across the workspace — NOT part of `check`, run it separately
@@ -55,47 +53,39 @@ These are the ones that cost real time to rediscover. The README carries the ful
 
 **Cache invalidation inside a mutation must go through `context.afterCommit()`.** `mutationProcedure` wraps handlers in `db.transaction(...)`, so a `cache.del()` called inline purges a key the transaction may still roll back. The `.use(afterCommit).use(transaction)` order in `packages/api/src/procedures.ts` is load-bearing — reversing it silently reintroduces the bug.
 
-**Sessions live in Postgres, not Redis.** Setting better-auth's `secondaryStorage` stops it writing the `session` row, which breaks the `activeOrganizationId` repair in `packages/auth/src/index.ts` and 403s every new user. `rateLimit.customStorage` is a different door and is the one we use. `packages/auth/src/personal-organization.db.test.ts` guards this.
-
 **Optional infrastructure degrades, but security limits never vanish.** Redis, storage and the queue all degrade rather than erroring — with `REDIS_URL` unset the server boots normally and the cache becomes a pass-through. Rate limits are the exception to failing open: count through `countHit` from `@k22i/redis`, which falls back to an in-process window (per process, so looser across replicas) rather than letting everything through ([ADR 0004](docs/adr/0004-fail-closed-security-limits.md)). Preserve both when adding callers.
-
-**Reset links never go through `log`.** Structured logs drain to PostHog, so a logged reset URL is an account takeover handed to a third party. Nothing sends email: reset links go out through `deliver()` (raw stdout) or back to the admin who asked for one, and point straight at the web page rather than better-auth's `/api/auth/reset-password/<token>` redirect, whose path the request logger records. Invitations are bearer links: never match one by email. Sign-up is closed after the first account unless `ALLOW_SIGNUP=true`. See [ADR 0001](docs/adr/0001-no-email-admin-driven-recovery.md) and [packages/auth/README.md](packages/auth/README.md#recovery-and-sign-up-internals).
 
 **apps/server enqueues, apps/workers runs.** Cron and queue maintenance belong to workers so nothing competes with the request path. `queue.start()` is fatal in workers and deliberately non-fatal in the server.
 
-**Feature flags are declared in code and valued in the database.** `packages/env/src/flags.ts` is the registry — adding a flag is still a deploy, which is what keeps `FeatureFlagName` a typed union — but its on/off value lives in `feature_flag` and is toggled at `/admin/flags`. Reads go through `getFeatureFlags(db)` / `isFeatureEnabled(db, name)` in `packages/api/src/feature-flags/feature-flags.cache.ts`, cached per process for 30s. Two things follow: the admin `set`/`reset` handlers must invalidate via `context.afterCommit()` and must never read flags inside their own transaction, and hiding UI with `useFeatureFlag` is cosmetic — use `requireFlag()` on the procedure to make something actually unreachable (it answers `NOT_FOUND`, not `FORBIDDEN`).
+**Feature flags are declared in code and valued in the database.** `packages/env/src/flags.ts` is the registry — adding a flag is still a deploy, which is what keeps `FeatureFlagName` a typed union — but its on/off value lives in `feature_flag`, written directly (there is no admin UI). Reads go through `getFeatureFlags(db)` / `isFeatureEnabled(db, name)` in `packages/api/src/feature-flags/feature-flags.cache.ts`, cached per process for 30s. Hiding UI with `useFeatureFlag` is cosmetic — use `requireFlag()` on the procedure to make something actually unreachable (it answers `NOT_FOUND`, not `FORBIDDEN`).
 
-**Two role columns.** `member.role` is per-organization and is what `requirePermission` reads; `user.role` is global, from better-auth's `admin()` plugin, for back-office powers. Product permissions belong on the first.
+**The SPA and the API share one origin.** `VITE_SERVER_URL` defaults to `/`, and nginx in the web image proxies `/rpc` to `SERVER_UPSTREAM`. That is what keeps the web image environment-agnostic (one build promotes staging → production). A new public route needs its own nginx `location` and Vite proxy entry. Three things follow: the API needs no public hostname, `TRUSTED_PROXY_HOPS` must count the proxies in front (1 for nginx alone) or rate limiting keys every caller to the proxy's IP, and the nginx upstream goes through a `resolver` with a variable because a literal hostname in `proxy_pass` is resolved once at startup and cached for the life of the process.
 
-**The SPA and the API share one origin.** `VITE_SERVER_URL` defaults to `/`, and nginx in the web image proxies `/api/auth` and `/rpc` to `SERVER_UPSTREAM` — two prefixes, not one, because the server mounts them as siblings at its root. That is what keeps the web image environment-agnostic (one build promotes staging → production). A new public route needs its own nginx `location` and Vite proxy entry. Three things follow: the API needs no public hostname, `TRUSTED_PROXY_HOPS` must count the proxies in front (1 for nginx alone) or rate limiting keys every caller to the proxy's IP, and the nginx upstream goes through a `resolver` with a variable because a literal hostname in `proxy_pass` is resolved once at startup and cached for the life of the process.
+**A route's `head()` title is its breadcrumb.** `AppBreadcrumbs` builds the trail from the matched routes' `head()` meta titles, so naming a screen for the tab names it in the breadcrumb too, and there is no second table of paths to keep in sync. A route with no title contributes no crumb; the root's title is the product name and is skipped. For a dynamic segment, `head({ loaderData })` reads the record — which means the route needs a `loader`, and **`loader` must be written above `head`** or TypeScript infers `loaderData` as `never`. That ordering is why such routes carry an `oxlint-disable sort-keys`.
 
-**A route's `head()` title is its breadcrumb.** `AppBreadcrumbs` builds the trail from the matched routes' `head()` meta titles, so naming a screen for the tab names it in the breadcrumb too, and there is no second table of paths to keep in sync. A route with no title contributes no crumb; the root's title is the product name and is skipped. For a dynamic segment, `head({ loaderData })` reads the record — which means the route needs a `loader`, and **`loader` must be written above `head`** or TypeScript infers `loaderData` as `never`. That ordering is why `users.$userId.tsx` and `organizations.$organizationId.tsx` carry an `oxlint-disable sort-keys`.
+**`/rpc` requires an `x-csrf-token` header.** oRPC's `SimpleCsrfProtectionHandlerPlugin` refuses calls without it, so a cross-site page cannot call it without a preflight `CORS_ORIGIN` refuses. Every `RPCLink` — web and tests — needs `SimpleCsrfProtectionLinkPlugin`, or every call is a 403.
 
-**`/rpc` requires an `x-csrf-token` header.** oRPC's `SimpleCsrfProtectionHandlerPlugin` refuses calls without it, so a cross-site page cannot ride the session cookie without a preflight `CORS_ORIGIN` refuses. Every `RPCLink` — web, native and tests — needs `SimpleCsrfProtectionLinkPlugin`, or every call is a 403.
-
-**The runtime images carry production dependencies only.** The server and workers images are `pnpm deploy --prod` output plus the bundle, so there is no tsx, drizzle-kit or workspace source in them. The server therefore bundles what it needs to run operations: `apps/server/src/start.ts`, the image's entry, applies migrations and pg-boss's schema on boot and then runs pending post-migration scripts, which `apps/server/tsdown.config.ts` bundles in statically; the admin CLIs are bundled into `apps/server/dist/admin/`. CI never touches the database. A new operational command gets bundled the same way, not run through tsx. Every migration must stay backward compatible with the previous image, which keeps running against the new schema during a rolling deploy.
+**The runtime images carry production dependencies only.** The server and workers images are `pnpm deploy --prod` output plus the bundle, so there is no tsx, drizzle-kit or workspace source in them. The server therefore bundles what it needs to run operations: `apps/server/src/start.ts`, the image's entry, applies migrations and pg-boss's schema on boot and then runs pending post-migration scripts, which `apps/server/tsdown.config.ts` bundles in statically. CI never touches the database. A new operational command gets bundled the same way, not run through tsx. Every migration must stay backward compatible with the previous image, which keeps running against the new schema during a rolling deploy.
 
 **Presigned uploads bypass the server's CORS config.** The browser PUTs straight to the bucket, so the _bucket_ must allow the web origin, and the SPA's CSP `connect-src` must include the storage endpoint (`CSP_CONNECT_SRC` in `apps/web/nginx.conf.template`). `S3_ENDPOINT` and `S3_PUBLIC_ENDPOINT` are not the same thing.
 
 ## Writing code here
 
-**Procedures.** Add at the right rung of the ladder in `packages/api/src/procedures.ts`: `publicProcedure` → `protectedProcedure` → `orgProcedure` → `adminProcedure`, each with a `mutation` variant that adds the transaction and `afterCommit`. `requirePermission` is the declarative check for route-level authorization; `assertPermission` is the same check as an expression when authorization depends on the row rather than the route. Feature-scoped files live beside their feature (`packages/api/src/files/files.router.ts`), and `*.platform.ts` is the platform-admin surface, which deliberately ignores `organizationId` — say so in a comment, since every other query in this codebase filters on it.
+**Procedures.** Two rungs in `packages/api/src/procedures.ts`: `publicProcedure` for reads and `mutationProcedure` (`publicProcedure` plus `afterCommit` and the transaction) for writes. Feature-scoped files live beside their feature (`packages/api/src/jobs/jobs.router.ts`).
 
-**Routers are transport** ([ADR 0005](docs/adr/0005-routers-are-transport.md)). A `*.router.ts` holds input schemas, the procedure rung, permissions and a call into the feature's `*.queries.ts` (reads) or `*.commands.ts` (writes) — plain `(db, organizationId, …)` functions that workers can import too. Only `routers/index.ts` and `routers/admin.ts` may import a router (tests excepted); oxlint's `no-restricted-imports` enforces it. Cross-feature helpers live in `packages/api/src/shared/`: `errors.ts` has `notFound(entity)` and `domainErrors`, the codes whose messages are written for people, declared on the base builder so they reach the web as defined errors — throw INTERNAL_SERVER_ERROR for anything whose message is not.
+**Routers are transport** ([ADR 0005](docs/adr/0005-routers-are-transport.md)). A `*.router.ts` holds input schemas, the procedure rung and a call into the feature's `*.queries.ts` (reads) or `*.commands.ts` (writes) — plain `(db, …)` functions that workers can import too. Only `routers/index.ts` may import a router (tests excepted); oxlint's `no-restricted-imports` enforces it. Cross-feature helpers live in `packages/api/src/shared/`: `errors.ts` has `notFound(entity)` and `domainErrors`, the codes whose messages are written for people, declared on the base builder so they reach the web as defined errors — throw INTERNAL_SERVER_ERROR for anything whose message is not.
 
 **Web errors toast once, from the `QueryClient`.** `apps/web/src/utils/orpc.ts` toasts failed queries and mutations through `errorMessage`, which shows only defined errors' messages; a screen that shows the failure inline sets `meta: { suppressErrorToast: true }` instead of its own `onError`. Defined errors are never retried. Type procedure results with `RouterOutputs`, not `typeof client`; component tests mock `@/utils/client`.
 
 **Logging.** Reach for `log` from `@k22i/observability`, never `console`. Every call carries an `action` — a dotted, snake_cased event name that is the thing you will later grep and alert on (`redis.error`, `queue.start_failed`, `featureflags.read.failed`). Spread `parseError(error)` into the payload rather than stringifying the error yourself.
 
-**Styling.** The `shadcn/*` oxlint rules are errors in app code: no raw colors, no inline styles, no arbitrary values, no unknown classes, and class names must be static strings (no `` `text-${tone}-500` ``). Colors come from the theme in `packages/ui/src/styles/globals.css`. `layout` is the one allowed arbitrary-value escape. Two exemptions are configured deliberately in `oxlint.config.ts`: `packages/ui/src/**` may style itself because it _is_ the design system, and `apps/native/**` is off entirely because it is heroui-native with no shared theme. Import primitives as `@k22i/ui/components/button`; add more with `npx shadcn@latest add @coss/<name> -c packages/ui`.
+**Styling.** The `shadcn/*` oxlint rules are errors in app code: no raw colors, no inline styles, no arbitrary values, no unknown classes, and class names must be static strings (no `` `text-${tone}-500` ``). Colors come from the theme in `packages/ui/src/styles/globals.css`. `layout` is the one allowed arbitrary-value escape. One exemption is configured deliberately in `oxlint.config.ts`: `packages/ui/src/**` may style itself because it _is_ the design system. Import primitives as `@k22i/ui/components/button`; add more with `npx shadcn@latest add @coss/<name> -c packages/ui`.
 
-**Lint deltas from the Ultracite preset.** `no-await-in-loop` is off — plenty of loops here are deliberately sequential (ordered migrations, retry backoff, cursor walks) and the rule's suggested fix is a bug. `react/no-unstable-nested-components` allows render props, for expo-router's `tabBarIcon` and friends. Everything else is the preset, and `pnpm fix` autofixes most of it.
+**Lint deltas from the Ultracite preset.** `no-await-in-loop` is off — plenty of loops here are deliberately sequential (ordered migrations, retry backoff, cursor walks) and the rule's suggested fix is a bug. `react/no-unstable-nested-components` allows render props. Everything else is the preset, and `pnpm fix` autofixes most of it.
 
 **Comments.** One line, naming the bug the line prevents. [TERSE.md](TERSE.md) has the budget, what earns more than a line, and the directive and template-literal gotchas.
 
 **Columns.** Instants come from `packages/db/src/schema/columns.ts`: `timestamptz()` (never bare `timestamp()`) and `timestamps()` for the usual `createdAt`/`updatedAt` pair ([ADR 0003](docs/adr/0003-timestamptz-for-instants.md)). Status and type columns are text plus a CHECK built with `oneOf()`, not a pg enum.
-
-**Tenant references.** A table holding organization data carries `organization_id` and points at another organization-owned row through a composite foreign key on `(organization_id, <parent>_id)` against the parent's `UNIQUE (organization_id, id)` ([ADR 0002](docs/adr/0002-tenant-integrity-in-the-database.md)), so a cross-tenant reference is a database error rather than something each procedure must remember to prevent.
 
 **Migrations and backfills.** `pnpm db:push` is for local iteration only; anything committed gets a migration. Generate it with `pnpm db:generate --name <snake_case_description>` so the folder name says what it does. Start from what `drizzle-kit generate` wrote; hand-edit the SQL only when it cannot express the change safely (a `USING` cast, composite foreign keys added `NOT VALID` then `VALIDATE`d), and validate a hand-edited migration on a scratch database. **Backfills never go in a migration**: data backfills and reference rows go in `packages/db/src/post-migration-scripts/`, so use `db:deploy`, never `db:migrate` alone.
 
@@ -201,13 +191,12 @@ Oxlint catches most of the above automatically. Spend your own attention on:
 
 Each of these has a README section carrying the reasoning the summary above compresses:
 
-- [Feature flags](README.md#feature-flags), [Authorization (RBAC)](README.md#authorization-rbac)
+- [Feature flags](README.md#feature-flags)
 - [Redis](README.md#redis) and [Cache](README.md#cache), [Object storage](README.md#object-storage)
 - [Security headers](README.md#security-headers), [The web image is environment-agnostic](README.md#the-web-image-is-environment-agnostic)
 - [Page titles and breadcrumbs](README.md#page-titles-and-breadcrumbs), [UI Customization](README.md#ui-customization)
 - [Post-migration scripts](README.md#post-migration-scripts) and its [authoring guide](packages/db/src/dev-scripts/post-migrate/README.md)
-- [Accounts, recovery and invitations](README.md#accounts-recovery-and-invitations), [packages/auth/README.md](packages/auth/README.md) — RBAC, recovery internals
-- [docs/self-hosting.md](docs/self-hosting.md) — operator view: images, the first account, proxies, optional services
+- [docs/self-hosting.md](docs/self-hosting.md) — operator view: images, proxies, optional services
 - [apps/server/README.md](apps/server/README.md) — boot migrations, client IP and `TRUSTED_PROXY_HOPS`
 - [docs/adr/](docs/adr/) — the decisions behind the invariants above
 - [CONTRIBUTING.md](CONTRIBUTING.md) — first-run setup, env files, the services to bring up

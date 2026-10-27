@@ -15,7 +15,7 @@ services:
     environment:
       # Appended to the SPA's `connect-src` (see apps/web/nginx.conf.template).
       # Only MinIO: the API is same-origin now, reached through this container's
-      # own /api/auth and /rpc proxy, so `'self'` covers it. Uploads go straight
+      # own /rpc proxy, so `'self'` covers it. Uploads go straight
       # from the page to a presigned URL and never touch the server, which is why
       # the bucket still has to be named here — leave it out and uploads break
       # while everything else keeps working, which is a confusing way to find out.
@@ -44,8 +44,6 @@ services:
         required: false
     environment:
       PORT: ${SERVER_PORT:-1900}
-      # The browser's origin, since auth goes through the web proxy.
-      BETTER_AUTH_URL: http://localhost:${WEB_PORT:-2600}
       CORS_ORIGIN: http://localhost:${WEB_PORT:-2600}
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/k22i
       # Server -> bucket, over the compose network.
@@ -120,7 +118,7 @@ services:
     container_name: k22i-redis
     init: true
     # `--save 60 1` is one snapshot a minute if at least one key changed. Nothing
-    # here is authoritative — sessions live in Postgres — so this exists only so a
+    # here is authoritative, so this exists only so a
     # `docker compose restart` does not reset everyone's rate-limit budget.
     command: ["redis-server", "--save", "60", "1"]
     ports:

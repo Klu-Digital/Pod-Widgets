@@ -53,8 +53,7 @@ jobs:
       - uses: useblacksmith/checkout@25227e61ff9dafe400e22fa487b673eac4e4409a # v1.8.1
       - uses: ./.github/actions/setup-workspace
       # Deliberately separate from `pnpm check` — ultracite runs with
-      # typeAware/typeCheck off, so nothing else in CI reads a type error. This
-      # covers apps/native too, which has no other job.
+      # typeAware/typeCheck off, so nothing else in CI reads a type error.
       # routeTree.gen.ts is gitignored; the Vite plugin writes it on dev/build,
       # so a bare checkout has none and every route's types collapse to never.
       - run: pnpm --filter web routes:generate

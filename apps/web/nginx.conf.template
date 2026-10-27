@@ -30,7 +30,7 @@ server {
     add_header Cross-Origin-Opener-Policy "same-origin" always;
     add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()" always;
 
-    # The same value the API sends on /api/auth and /rpc (Hono's default), so the
+    # The same value the API sends on /rpc (Hono's default), so the
     # origin carries one policy. Browsers ignore it over plain HTTP.
     add_header Strict-Transport-Security "max-age=15552000; includeSubDomains" always;
 
@@ -52,40 +52,20 @@ server {
     # Dockerfile's `ENV CSP_CONNECT_SRC=""` is what keeps that from happening.
     add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: ${CSP_CONNECT_SRC}; font-src 'self' data:; connect-src 'self' ${CSP_CONNECT_SRC}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'" always;
 
-    # The API, reached on the SPA's own origin. Two prefixes rather than one
-    # because the server mounts them as siblings at its root — /api/auth/* from
-    # better-auth, /rpc and /rpc/* from oRPC — so there is no single prefix that
-    # covers both, and nothing here rewrites the path: the server sees exactly
-    # what it mounts.
+    # The API, reached on the SPA's own origin. Nothing here rewrites the path:
+    # the server sees exactly what it mounts.
     #
     # Deliberately narrow. /api-reference (the Scalar docs) and the Prometheus
     # metrics path are mounted on the same server and are NOT listed here, so
     # they stay unreachable from the public origin.
-    location /api/auth {
-        set $api_upstream "${SERVER_UPSTREAM}";
-        proxy_pass $api_upstream$request_uri;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        # Append, never overwrite: a proxy in front of this one wrote the client
-        # further left. packages/auth/src/client-ip.ts counts TRUSTED_PROXY_HOPS
-        # entries back from the right, so what a caller sends is never trusted.
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        # This single header exists to *replace* the inherited set, per the note
-        # above: the API sends its own security headers, including a strict
-        # `default-src 'none'` CSP, and a second CSP header from here would make
-        # the browser enforce the intersection of the two policies. Declaring any
-        # add_header in this location drops all the server-level ones, which is
-        # what we want; nosniff is the one worth restating at the edge.
-        add_header X-Content-Type-Options "nosniff" always;
-    }
-
     location /rpc {
         set $rpc_upstream "${SERVER_UPSTREAM}";
         proxy_pass $rpc_upstream$request_uri;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
+        # Append, never overwrite: a proxy in front of this one wrote the client
+        # further left. apps/server/src/client-ip.ts counts TRUSTED_PROXY_HOPS
+        # entries back from the right, so what a caller sends is never trusted.
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 

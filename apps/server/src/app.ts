@@ -1,24 +1,14 @@
-import { auth } from "@k22i/auth";
-import { withClientIp } from "@k22i/auth/client-ip";
 import { env } from "@k22i/env/server";
 import { honoLogger } from "@k22i/observability/hono";
 import type { EvlogVariables } from "@k22i/observability/hono";
-import { createAuthMiddleware } from "evlog/better-auth";
-import type { BetterAuthInstance } from "evlog/better-auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
 
-import { clientIpOf } from "./client-ip";
 import { mountHealth } from "./health";
 import { mountMetrics } from "./metrics";
 import { mountOrpc } from "./orpc";
 import { mountSecurityHeaders } from "./security-headers";
-
-const identifyUser = createAuthMiddleware(auth as BetterAuthInstance, {
-  exclude: ["/api/auth/**"],
-  maskEmail: true,
-});
 
 export const createApp = () => {
   const app = new Hono<EvlogVariables>();
@@ -27,8 +17,7 @@ export const createApp = () => {
   // alike; an inbound x-request-id from the proxy is kept.
   app.use(requestId());
 
-  // The reset path carries its token, and log lines drain to PostHog.
-  app.use(honoLogger({ exclude: ["/api/auth/reset-password/**"] }));
+  app.use(honoLogger());
 
   app.use("*", (c, next) => {
     // Excluded paths run without a request logger.
@@ -55,21 +44,10 @@ export const createApp = () => {
     })
   );
 
-  app.use("*", async (c, next) => {
-    await identifyUser(c.get("log"), c.req.raw.headers, c.req.path);
-    return next();
-  });
-
   // Liveness: answers while the process is up, whatever its dependencies say.
   app.get("/", (c) => c.text("OK"));
 
   mountHealth(app);
-
-  // better-auth sees only a `Request`, never the socket, so the server resolves
-  // the caller once and stamps it on (see packages/auth/src/client-ip.ts).
-  app.on(["POST", "GET"], "/api/auth/*", (c) =>
-    auth.handler(withClientIp(c.req.raw, clientIpOf(c)))
-  );
 
   mountOrpc(app, { apiReference: env.NODE_ENV !== "production" });
 

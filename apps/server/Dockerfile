@@ -26,9 +26,8 @@ RUN cd apps/server && SKIP_ENV_VALIDATION=1 NODE_ENV=production pnpm run build
 RUN --mount=type=cache,target=/pnpm-store pnpm --config.inject-workspace-packages=true deploy --filter=server --prod --store-dir /pnpm-store /prod/server
 
 # Last, so it stays the default target for compose and a plain `docker build`.
-# From `base` for pnpm: `pnpm admin:reset-password <email>` is the recovery path
-# for a locked-out production admin. The deployed package.json replaces the root
-# one, so pnpm runs the server's scripts.
+# From `base` for pnpm. The deployed package.json replaces the root one, so pnpm
+# runs the server's scripts.
 FROM base AS runner
 ENV NODE_ENV=production
 # Root-owned and run as `node`: the process cannot rewrite its own code.

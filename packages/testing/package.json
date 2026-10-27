@@ -14,8 +14,6 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@faker-js/faker": "^10.6.0",
-    "@k22i/auth": "workspace:*",
     "@k22i/db": "workspace:*",
     "@k22i/env": "workspace:*",
     "@k22i/queue": "workspace:*",
