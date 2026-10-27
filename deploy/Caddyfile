@@ -1,0 +1,4 @@
+# SITE_ADDRESS=:80 serves plain HTTP; a domain name gets automatic TLS.
+{$SITE_ADDRESS::80} {
+	reverse_proxy web:2600
+}

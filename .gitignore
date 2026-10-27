@@ -58,3 +58,6 @@ coverage
 tmp
 temp
 .vitest/
+
+# VPS deploy secrets
+deploy/.env.vps

@@ -87,6 +87,23 @@ pnpm docker:up
 
 The compose stack mirrors production — one published port (`WEB_PORT`, container port 2600, because the unprivileged nginx image cannot bind 80), three non-root images each with its own `HEALTHCHECK` — except that it skips migrate-on-boot, because a local database is usually push-built. Hence `pnpm db:deploy` above.
 
+## Deploy to a VPS
+
+`deploy/docker-compose.vps.yml` builds the images from source and runs Caddy, web, server, workers and Postgres on one host. It is for a throwaway box: there is no auth, so **anyone with the URL can read and edit everything**. Use throwaway data only.
+
+Prerequisites: a Linux host with Docker (Compose v2) and ports 80 and 443 open.
+
+```bash
+git clone <repo> && cd <repo>
+cp deploy/.env.vps.example deploy/.env.vps   # set POSTGRES_PASSWORD and PUBLIC_ORIGIN
+docker compose -f deploy/docker-compose.vps.yml --env-file deploy/.env.vps up -d --build --wait
+```
+
+- **TLS.** `SITE_ADDRESS=:80` serves plain HTTP on the host's IP. For a domain, point its DNS at the host, set `SITE_ADDRESS=app.example.com` and `PUBLIC_ORIGIN=https://app.example.com`, and Caddy gets a certificate on its own. `PUBLIC_ORIGIN` becomes `CORS_ORIGIN`, so it must match the browser's address exactly.
+- **Exposed.** Only Caddy, on `HTTP_PORT` and `HTTPS_PORT`. Web, server, workers and Postgres publish nothing.
+- **Migrations.** The server applies them on boot, so run one replica. `TRUSTED_PROXY_HOPS` is fixed at `2` (Caddy, then nginx).
+- **Uploads, later.** Nothing uses object storage yet. When it does, uncomment the uploads block in `deploy/.env.vps` and add `--profile uploads`. That starts MinIO and publishes its S3 API on `MINIO_PORT`. Keep `S3_PUBLIC_ENDPOINT`, `CSP_CONNECT_SRC` and `PUBLIC_ORIGIN` consistent: the first two name the MinIO address the browser reaches, and `PUBLIC_ORIGIN` is also MinIO's CORS allow-origin.
+
 ## Deployment configuration
 
 ```bash
