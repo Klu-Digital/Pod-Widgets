@@ -12,10 +12,6 @@ export const sharedServerVariables = {
   POSTHOG_PROJECT_API_KEY: z.string().startsWith("phc_").optional(),
   PROMETHEUS_METRICS_PATH: z.string().startsWith("/").optional(),
   PROMETHEUS_METRICS_TOKEN: z.string().min(1).optional(),
-  /** Prefixes every key. Set this when several environments share one instance. */
-  REDIS_KEY_PREFIX: z.string().min(1).optional(),
-  /** Redis-backed features degrade gracefully when unset. */
-  REDIS_URL: z.string().min(1).optional(),
   S3_ACCESS_KEY_ID: z.string().min(1).optional(),
   S3_BUCKET: z.string().min(1).optional(),
   /** Server -> bucket. Omit for real AWS S3. */

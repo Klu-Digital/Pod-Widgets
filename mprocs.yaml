@@ -1,4 +1,4 @@
-# Panes for `pnpm dev`. Infra (postgres, redis, minio) is already up by the time
+# Panes for `pnpm dev`. Infra (postgres, minio) is already up by the time
 # mprocs starts — `pnpm dev` runs `dev:infra` first — so these are the host
 # processes only.
 #
@@ -34,5 +34,5 @@ procs:
 
   # Container logs, on demand. `pnpm dev:infra` has already started these.
   infra:
-    shell: docker compose logs -f postgres redis minio
+    shell: docker compose logs -f postgres minio
     autostart: false

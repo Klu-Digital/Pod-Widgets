@@ -112,10 +112,3 @@ export const identityMutationProcedure = publicProcedure
   .use(identity)
   .use(afterCommit)
   .use(transaction);
-
-/**
- * Template primitive with no caller yet; see ./rate-limit.ts.
- *
- * @public
- */
-export { rateLimit } from "./rate-limit";

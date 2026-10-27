@@ -117,20 +117,6 @@ export const configManifest = [
     targets: ["local-server", "dokploy-server"],
   },
   {
-    description: "Prefix for Redis keys",
-    kind: "config",
-    name: "REDIS_KEY_PREFIX",
-    required: false,
-    targets: ["local-server", "dokploy-server"],
-  },
-  {
-    description: "Optional Redis connection string",
-    kind: "provider-secret",
-    name: "REDIS_URL",
-    required: false,
-    targets: ["local-server", "dokploy-server"],
-  },
-  {
     description: "Object-storage access key",
     kind: "provider-secret",
     name: "S3_ACCESS_KEY_ID",
@@ -197,14 +183,6 @@ export const configManifest = [
     description: "Maximum object upload size",
     kind: "config",
     name: "STORAGE_MAX_UPLOAD_BYTES",
-    required: false,
-    targets: ["local-server", "dokploy-server"],
-  },
-  {
-    description:
-      "Proxies in front of the server, counted for client IP resolution",
-    kind: "config",
-    name: "TRUSTED_PROXY_HOPS",
     required: false,
     targets: ["local-server", "dokploy-server"],
   },

@@ -53,8 +53,6 @@ services:
       NODE_ENV: production
       CORS_ORIGIN: ${PUBLIC_ORIGIN:?set in .env.vps}
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?set in .env.vps}@postgres:5432/trumpet-pods
-      # Caddy -> nginx -> server: one fewer and every caller shares Caddy's IP.
-      TRUSTED_PROXY_HOPS: 2
       # Inert until #18 wires uploads; empty values read as unset.
       S3_ENDPOINT: http://minio:9000
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-}

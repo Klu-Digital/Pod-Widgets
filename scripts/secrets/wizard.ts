@@ -446,17 +446,6 @@ const collectInfrastructure = async (
     console.log("✓ DATABASE_URL already configured");
   }
 
-  if (
-    needs(state, "REDIS_URL", environment) &&
-    (await confirm("Configure optional Redis?"))
-  ) {
-    collect(
-      collection,
-      "REDIS_URL",
-      await requiredValue("Redis URL", { secret: true })
-    );
-  }
-
   await collectStorage(collection, state, environment);
 };
 

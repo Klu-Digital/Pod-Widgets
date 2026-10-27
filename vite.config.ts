@@ -57,10 +57,7 @@ export default defineConfig({
       {
         test: {
           environment: "node",
-          globalSetup: [
-            "./packages/testing/src/setup/global-postgres.ts",
-            "./packages/testing/src/setup/global-redis.ts",
-          ],
+          globalSetup: ["./packages/testing/src/setup/global-postgres.ts"],
           hookTimeout: 120_000,
           include: ["{apps,packages}/*/src/**/*.db.test.ts"],
           name: "db",

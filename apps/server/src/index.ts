@@ -7,7 +7,6 @@ import { env } from "@trumpet-pods/env/server";
 // Initializes the logger at module scope, so it must come before ./app, which
 // pulls in @trumpet-pods/db. Keep this import first.
 import { exitOnCrash, log, observability } from "@trumpet-pods/observability";
-import { redis } from "@trumpet-pods/redis";
 
 import { createApp } from "./app";
 
@@ -60,8 +59,7 @@ const handleShutdownSignal = (signal: "SIGTERM" | "SIGINT") => {
   void (async () => {
     log.info({ action: "server.shutdown", signal });
     await drain(server);
-    // allSettled, not all: a failed Redis quit must not prevent the log flush.
-    await Promise.allSettled([observability.flush(), redis.quit()]);
+    await observability.flush();
     process.exit(0);
   })();
 };

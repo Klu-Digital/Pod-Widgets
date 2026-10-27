@@ -16,7 +16,6 @@
   "dependencies": {
     "@trumpet-pods/db": "workspace:*",
     "@trumpet-pods/env": "workspace:*",
-    "ioredis": "catalog:",
     "pg": "catalog:"
   },
   "devDependencies": {

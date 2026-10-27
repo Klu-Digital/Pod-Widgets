@@ -50,7 +50,6 @@ const isValid = (name: string, value: string): boolean => {
       "POSTHOG_HOST",
       "S3_ENDPOINT",
       "S3_PUBLIC_ENDPOINT",
-      "REDIS_URL",
     ].includes(name)
   ) {
     return isUrl(value);

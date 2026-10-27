@@ -55,14 +55,8 @@ services:
       S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
       S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
       S3_FORCE_PATH_STYLE: "true"
-      # Server -> Redis, over the compose network. Unlike MinIO there is no
-      # public-endpoint twin here — nothing about Redis is ever handed to a
-      # browser, so no client-reachable host needs to be baked into anything.
-      REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
-        condition: service_healthy
-      redis:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
@@ -81,27 +75,6 @@ services:
       - trumpet-pods_postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-  redis:
-    image: redis:8-alpine@sha256:3811787313eba226a2ef38658c6ccb91cd5e110edc89c37767de373120a0e5a0
-    container_name: trumpet-pods-redis
-    init: true
-    # `--save 60 1` is one snapshot a minute if at least one key changed. Nothing
-    # here is authoritative, so this exists only so a
-    # `docker compose restart` does not reset everyone's rate-limit budget.
-    command: ["redis-server", "--save", "60", "1"]
-    ports:
-      # 6666 on the host; the container-internal port stays 6379, so the
-      # compose-network REDIS_URL on the server service is unaffected.
-      - "${REDIS_PORT:-6666}:6379"
-    volumes:
-      - trumpet-pods_redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -154,4 +127,3 @@ services:
 volumes:
   trumpet-pods_postgres_data:
   trumpet-pods_minio_data:
-  trumpet-pods_redis_data:

@@ -4,21 +4,14 @@ import type { Context as HonoContext } from "hono";
 
 export interface CreateContextOptions {
   context: HonoContext<EvlogVariables>;
-  /**
-   * Resolved once per request by the server (`resolveClientIp` in
-   * `apps/server/src/client-ip.ts`), which owns the socket — this package does
-   * not depend on `@hono/node-server`.
-   */
-  ip?: string | undefined;
 }
 
-export const createContext = ({ context, ip }: CreateContextOptions) => ({
+export const createContext = ({ context }: CreateContextOptions) => ({
   db,
   identityHeaders: {
     id: context.req.header("x-identity-id") || undefined,
     name: context.req.header("x-identity-name") || undefined,
   },
-  ip,
   log: context.get("log"),
 });
 

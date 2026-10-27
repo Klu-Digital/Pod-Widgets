@@ -92,7 +92,7 @@ jobs:
   test-db:
     name: Database tests
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    # Boots postgres:18 and redis:8-alpine through testcontainers and runs
+    # Boots postgres:18 through testcontainers and runs
     # drizzle-kit migrate against the template database before the first test.
     timeout-minutes: 25
     steps:
