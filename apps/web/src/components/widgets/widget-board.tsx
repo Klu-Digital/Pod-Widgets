@@ -7,6 +7,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { AddWidgetButton } from "@/components/add-widget-button";
+import { ActivitySheet } from "@/components/widgets/activity-sheet";
 import { WidgetByType } from "@/components/widgets/registry";
 import type { BoardWidget } from "@/components/widgets/registry";
 import { useDeleteWidget } from "@/components/widgets/use-delete-widget";
@@ -65,13 +66,16 @@ export const WidgetBoard = () => {
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-2xl font-semibold">Pod Widgets</h1>
         {pageId ? (
-          <AddWidgetButton
-            onAdd={add}
-            types={[
-              { label: "Text", type: "text" },
-              { label: "Banner", type: "banner" },
-            ]}
-          />
+          <div className="flex items-center gap-2">
+            <ActivitySheet pageId={pageId} />
+            <AddWidgetButton
+              onAdd={add}
+              types={[
+                { label: "Text", type: "text" },
+                { label: "Banner", type: "banner" },
+              ]}
+            />
+          </div>
         ) : null}
       </div>
       {widgets.data?.map((widget) => (
