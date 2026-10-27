@@ -3,11 +3,10 @@ import type { Pool } from "pg";
 
 import { createDb } from "../../index";
 import type { Database } from "../../index";
-import type { SeedContext, SeedOptions } from "./define";
-import { usersSeeder } from "./seeders/users";
+import type { SeedContext, SeedOptions, Seeder } from "./define";
 
 /** Ordered; a future seeder is appended here, not inserted arbitrarily. */
-const SEEDERS = [usersSeeder];
+const SEEDERS: Seeder<unknown>[] = [];
 
 export interface RunOptions extends SeedOptions {
   dryRun?: boolean;
@@ -18,11 +17,9 @@ export interface RunOptions extends SeedOptions {
 /** Runs every seeder's `plan` → `conflicts` preflight, then `apply`, or reports why it stopped. */
 const makeContext = (
   db: Database,
-  auth: SeedContext["auth"],
   opts: SeedOptions,
   seederName: string
 ): SeedContext => ({
-  auth,
   db,
   faker: sharedFaker,
   log: (message) => console.log(`[${seederName}] ${message}`),
@@ -47,14 +44,12 @@ export const runSeed = async (
   options: RunOptions
 ): Promise<0 | 1> => {
   const db = createDb(pool);
-  const { createAuth } = await import("@k22i/auth");
-  const auth = createAuth();
 
   sharedFaker.seed(options.seed);
 
   const planned = await Promise.all(
     SEEDERS.map(async (seeder) => {
-      const ctx = makeContext(db, auth, options, seeder.name);
+      const ctx = makeContext(db, options, seeder.name);
       const plan = await seeder.plan(ctx);
       return { ctx, plan, seeder };
     })
@@ -80,7 +75,7 @@ export const runSeed = async (
       }
     }
     console.error(
-      '\nNothing was written. Reset with "pnpm db:purge --yes && pnpm db:migrate", then seed again.'
+      '\nNothing was written. Reset with "pnpm db:purge --yes && pnpm db:deploy", then seed again.'
     );
     return 1;
   }

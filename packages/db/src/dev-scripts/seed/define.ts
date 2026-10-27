@@ -1,18 +1,13 @@
 import type { Faker } from "@faker-js/faker";
-import type { createAuth } from "@k22i/auth";
 
 import type { Database } from "../../index";
 
 /** CLI flags every seeder reads. New knobs go here, not into a bespoke env var. */
-export interface SeedOptions {
-  /** Random users to generate on top of the fixed ones. From `--users`. */
-  userCount: number;
-}
+export type SeedOptions = Record<never, never>;
 
 /** What every seeder gets, whether it's only planning or actually writing. */
 export interface SeedContext {
   db: Database;
-  auth: ReturnType<typeof createAuth>;
   /** Seeded once per run (see `--seed`), so the same flags produce the same data. */
   faker: Faker;
   opts: SeedOptions;
