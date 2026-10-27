@@ -19,6 +19,7 @@ const api = vi.hoisted(() => ({
   listPages: vi.fn(),
   listWidgets: vi.fn(),
   restoreWidget: vi.fn(),
+  updateBanner: vi.fn(),
   updateContent: vi.fn(),
 }));
 
@@ -30,6 +31,7 @@ vi.mock("@/utils/client", () => ({
       delete: api.deleteWidget,
       list: api.listWidgets,
       restore: api.restoreWidget,
+      updateBanner: api.updateBanner,
       updateContent: api.updateContent,
     },
   },
@@ -97,7 +99,8 @@ it("adds a widget and coalesces edits into one save", async () => {
   );
   renderBoard();
 
-  fireEvent.click(await screen.findByText("Add text widget"));
+  fireEvent.click(await screen.findByRole("button", { name: "Add widget" }));
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Text" }));
   await screen.findByLabelText("Widget text");
   expect(api.createWidget).toHaveBeenCalledWith(
     { pageId: PAGE_ID, type: "text" },
@@ -160,6 +163,43 @@ it("deletes a widget at once and brings it back with Undo", async () => {
 
   await screen.findByLabelText("Text widget");
   expect(api.restoreWidget).toHaveBeenCalledWith({ id: WIDGET_ID });
+});
+
+it("adds a banner and switches its variant", async () => {
+  localStorage.setItem(
+    "pod-widgets:identity",
+    JSON.stringify({ id: "me", name: "Kevin" })
+  );
+  api.createWidget.mockResolvedValue({
+    content: { content: [{ type: "paragraph" }], type: "doc" },
+    createdBy: "Kevin",
+    id: WIDGET_ID,
+    pageId: PAGE_ID,
+    type: "banner",
+    variant: "info",
+  });
+  api.updateBanner.mockResolvedValue(null);
+  renderBoard();
+
+  fireEvent.click(await screen.findByRole("button", { name: "Add widget" }));
+  fireEvent.click(await screen.findByRole("menuitem", { name: "Banner" }));
+  await screen.findByLabelText("Banner widget");
+  expect(api.createWidget).toHaveBeenCalledWith(
+    { pageId: PAGE_ID, type: "banner", variant: "info" },
+    expect.anything()
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: "Warning" }));
+  await waitFor(() =>
+    expect(api.updateBanner).toHaveBeenCalledWith(
+      { id: WIDGET_ID, variant: "warning" },
+      expect.anything()
+    )
+  );
+  expect(screen.getByRole("button", { name: "Warning" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
 });
 
 it("fires no request before an identity exists", async () => {
