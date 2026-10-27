@@ -14,6 +14,7 @@ import type { Editor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Toggle } from "@trumpet-pods/ui/components/toggle";
 import { cn } from "@trumpet-pods/ui/lib/utils";
+import { useEffect } from "react";
 import type React from "react";
 
 /** Plain ProseMirror JSON, so consumers need no Tiptap import to store it. */
@@ -34,6 +35,7 @@ export const EMPTY_DOC = {
 const HEADING_LEVEL = 2;
 
 export interface RichTextEditorProps {
+  autoFocus?: boolean;
   value: RichTextDoc;
   onChange: (doc: RichTextDoc) => void;
   onBlur?: () => void;
@@ -98,6 +100,7 @@ const Toolbar = ({ editor }: { editor: Editor }): React.ReactElement => {
 };
 
 export const RichTextEditor = ({
+  autoFocus,
   value,
   onChange,
   onBlur,
@@ -126,6 +129,12 @@ export const RichTextEditor = ({
     onUpdate: ({ editor: current }) => onChange(current.getJSON()),
     shouldRerenderOnTransaction: false,
   });
+
+  useEffect(() => {
+    if (autoFocus && editor) {
+      editor.commands.focus();
+    }
+  }, [autoFocus, editor]);
 
   return (
     <div

@@ -4,7 +4,7 @@ import { SimpleCsrfProtectionLinkPlugin } from "@orpc/client/plugins";
 import type { AppRouterClient } from "@trumpet-pods/api/routers/index";
 import { env } from "@trumpet-pods/env/web";
 
-import { getIdentity } from "@/lib/identity";
+import { identityHeaders } from "@/lib/identity";
 import { getServerUrl } from "@/lib/server-url";
 
 const link = new RPCLink({
@@ -14,16 +14,7 @@ const link = new RPCLink({
       credentials: "include",
     });
   },
-  headers() {
-    const identity = getIdentity();
-    // Encoded: fetch rejects header characters above U+00FF, e.g. "Zoë".
-    return identity
-      ? {
-          "x-identity-id": identity.id,
-          "x-identity-name": encodeURIComponent(identity.name),
-        }
-      : {};
-  },
+  headers: identityHeaders,
   // The server refuses RPC calls without its header (see apps/server/src/orpc.ts).
   plugins: [new SimpleCsrfProtectionLinkPlugin()],
   url: `${getServerUrl(env.VITE_SERVER_URL)}/rpc`,
