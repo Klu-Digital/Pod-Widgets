@@ -108,3 +108,11 @@ describe("POST /rpc/healthCheck", () => {
     expect(result).toBe("OK");
   });
 });
+
+describe("POST /rpc/widgets/list", () => {
+  it("answers 400 without identity headers", async () => {
+    await expect(
+      client().widgets.list({ pageId: "0b0f6f0e-1b6e-4d58-9a6a-3f1f2f6f1c11" })
+    ).rejects.toMatchObject({ code: "BAD_REQUEST", status: 400 });
+  });
+});
