@@ -102,17 +102,13 @@ const identity = o.middleware(({ context, next }) => {
 
 /**
  * `publicProcedure` that answers BAD_REQUEST without a valid identity and types
- * `context.identity`; no router uses it until #11.
- *
- * @public
+ * `context.identity`.
  */
 export const identityProcedure = publicProcedure.use(identity);
 
 /**
  * `mutationProcedure` behind the identity check, which runs before the
  * transaction opens so a rejected call never takes a connection.
- *
- * @public
  */
 export const identityMutationProcedure = publicProcedure
   .use(identity)

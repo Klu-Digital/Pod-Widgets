@@ -19,8 +19,6 @@ export const domainErrors = {
 
 /**
  * `notFound("File")` → NOT_FOUND "File not found".
- *
- * @public
  */
 export const notFound = (entity: string) =>
   new ORPCError("NOT_FOUND", { message: `${entity} not found` });
