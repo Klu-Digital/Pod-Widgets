@@ -1,19 +1,18 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 
-// See bootstrap.ts: this must run before the `await import(...)`s below,
-// `@k22i/auth` included — it reads validated env at module scope.
+// See bootstrap.ts: this must run before the `await import(...)`s below —
+// they read validated env at module scope.
 import { loadEnv, runLifecycle } from "../bootstrap";
 
 const USAGE = `Usage:
-  pnpm db:seed [--users <n>] [--seed <n>] [--dry-run]
+  pnpm db:seed [--seed <n>] [--dry-run]
 
-  --users <n>   random users to generate on top of the fixed ones (default 5)
   --seed <n>    faker seed, for reproducible output (default 22)
   --dry-run     plan and check for conflicts, then stop without writing
 
-Every seeded email is checked against the database first. If any already
-exist, nothing is written — see packages/db/src/dev-scripts/seed/README.md.
+Every seeder checks for colliding rows first. If any exist, nothing is
+written — see packages/db/src/dev-scripts/seed/README.md.
 `;
 
 const main = async (): Promise<void> => {
@@ -36,17 +35,11 @@ const main = async (): Promise<void> => {
     options: {
       "dry-run": { default: false, type: "boolean" },
       seed: { default: "22", type: "string" },
-      users: { default: "5", type: "string" },
     },
   });
 
-  const userCount = Number(values.users);
   const seed = Number(values.seed);
-  if (
-    !Number.isInteger(userCount) ||
-    userCount < 0 ||
-    !Number.isInteger(seed)
-  ) {
+  if (!Number.isInteger(seed)) {
     console.error(USAGE);
     process.exitCode = 1;
     return;
@@ -66,7 +59,7 @@ const main = async (): Promise<void> => {
   const pool = createPool();
 
   await runLifecycle(
-    () => runSeed(pool, { dryRun: values["dry-run"], seed, userCount }),
+    () => runSeed(pool, { dryRun: values["dry-run"], seed }),
     () => pool.end()
   );
 };

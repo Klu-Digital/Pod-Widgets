@@ -33,8 +33,6 @@
     "db:post-migrate:status": "vp run --filter @k22i/db post-migrate:status",
     "db:purge": "vp run --filter @k22i/db purge",
     "db:reset": "pnpm run db:purge --yes && pnpm run db:deploy && pnpm run db:seed",
-    "admin:grant": "vp run --filter @k22i/db grant-admin",
-    "admin:reset-password": "vp run --filter @k22i/db reset-password",
     "queue:migrate": "vp run --filter @k22i/queue queue:migrate",
     "db:seed": "vp run --filter @k22i/db seed",
     "db:start": "docker compose up -d postgres",

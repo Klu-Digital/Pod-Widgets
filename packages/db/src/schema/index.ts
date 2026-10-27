@@ -1,18 +1,23 @@
 // Explicit re-exports: drizzle needs the aggregate, but `export *` trips
 // `oxc/no-barrel-file`.
-export {
-  account,
-  invitation,
-  member,
-  organization,
-  session,
-  user,
-  verification,
-} from "./auth";
 export { featureFlag } from "./feature-flags";
+export { page } from "./pages";
 export {
   postMigration,
   postMigrationStatuses,
   type PostMigrationStatus,
 } from "./post-migration";
-export { file, fileStatuses, type FileStatus } from "./storage";
+export {
+  bannerVariants,
+  bannerWidget,
+  emptyDoc,
+  imageWidget,
+  textWidget,
+  widget,
+  widgetAudit,
+  widgetAuditActions,
+  widgetTypes,
+  type BannerVariant,
+  type WidgetAuditAction,
+  type WidgetType,
+} from "./widgets";

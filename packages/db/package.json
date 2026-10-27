@@ -15,13 +15,11 @@
     "db:migrate:deploy": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "grant-admin": "tsx src/dev-scripts/grant-admin/cli.ts",
     "post-migrate": "tsx src/dev-scripts/post-migrate/cli.ts",
     "post-migrate:run": "tsx src/dev-scripts/post-migrate/cli.ts run",
     "post-migrate:new": "tsx src/dev-scripts/post-migrate/cli.ts new",
     "post-migrate:status": "tsx src/dev-scripts/post-migrate/cli.ts status",
     "purge": "tsx src/dev-scripts/purge/cli.ts",
-    "reset-password": "tsx src/dev-scripts/reset-password/cli.ts",
     "seed": "tsx src/dev-scripts/seed/cli.ts",
     "check-types": "tsc --noEmit"
   },
@@ -35,7 +33,6 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
-    "@k22i/auth": "workspace:*",
     "@k22i/config": "workspace:*",
     "@types/pg": "^8.23.1",
     "@typescript/native": "catalog:",

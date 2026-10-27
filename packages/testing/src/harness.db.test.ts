@@ -1,6 +1,6 @@
-import { user } from "@k22i/db/schema/auth";
+import { page } from "@k22i/db/schema/pages";
 import { env } from "@k22i/env/shared-server";
-import { getTestDb } from "@k22i/testing";
+import { getTestDb } from "@k22i/testing/db";
 import { getTestRedis } from "@k22i/testing/redis";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -34,21 +34,23 @@ describe("test harness module-load ordering", () => {
 // These two pass in this order only if `beforeEach(truncateAll)` actually runs
 // between them — the isolation `setup/db.ts` promises, proven rather than assumed.
 describe("truncateAll isolation between tests", () => {
-  it("inserts a row into the user table", async () => {
+  it("inserts a row into the page table", async () => {
     const db = getTestDb();
 
-    await db
-      .insert(user)
-      .values({ email: "harness@example.com", name: "Harness User" });
+    await db.insert(page).values({
+      createdBy: "Harness",
+      createdById: crypto.randomUUID(),
+      title: "Harness Page",
+    });
 
-    const rows = await db.select().from(user);
+    const rows = await db.select().from(page);
     expect(rows).toHaveLength(1);
   });
 
-  it("starts with an empty user table, proving truncateAll ran before this test", async () => {
+  it("starts with an empty page table, proving truncateAll ran before this test", async () => {
     const db = getTestDb();
 
-    const rows = await db.select().from(user);
+    const rows = await db.select().from(page);
     expect(rows).toHaveLength(0);
   });
 });

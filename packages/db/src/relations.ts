@@ -3,57 +3,52 @@ import { defineRelations } from "drizzle-orm";
 import * as schema from "./schema";
 
 export const relations = defineRelations(schema, (r) => ({
-  account: {
-    user: r.one.user({
-      from: r.account.userId,
+  bannerWidget: {
+    widget: r.one.widget({
+      from: r.bannerWidget.widgetId,
       optional: false,
-      to: r.user.id,
+      to: r.widget.id,
     }),
   },
-  file: {
-    organization: r.one.organization({
-      from: r.file.organizationId,
+  imageWidget: {
+    widget: r.one.widget({
+      from: r.imageWidget.widgetId,
       optional: false,
-      to: r.organization.id,
-    }),
-    user: r.one.user({ from: r.file.userId, optional: false, to: r.user.id }),
-  },
-  invitation: {
-    inviter: r.one.user({
-      from: r.invitation.inviterId,
-      optional: false,
-      to: r.user.id,
-    }),
-    organization: r.one.organization({
-      from: r.invitation.organizationId,
-      optional: false,
-      to: r.organization.id,
+      to: r.widget.id,
     }),
   },
-  member: {
-    organization: r.one.organization({
-      from: r.member.organizationId,
-      optional: false,
-      to: r.organization.id,
-    }),
-    user: r.one.user({ from: r.member.userId, optional: false, to: r.user.id }),
+  page: {
+    audits: r.many.widgetAudit(),
+    widgets: r.many.widget(),
   },
-  organization: {
-    files: r.many.file(),
-    invitations: r.many.invitation(),
-    members: r.many.member(),
-  },
-  session: {
-    user: r.one.user({
-      from: r.session.userId,
+  textWidget: {
+    widget: r.one.widget({
+      from: r.textWidget.widgetId,
       optional: false,
-      to: r.user.id,
+      to: r.widget.id,
     }),
   },
-  user: {
-    accounts: r.many.account(),
-    files: r.many.file(),
-    members: r.many.member(),
-    sessions: r.many.session(),
+  widget: {
+    audits: r.many.widgetAudit(),
+    bannerWidget: r.one.bannerWidget(),
+    imageWidget: r.one.imageWidget(),
+    page: r.one.page({
+      from: r.widget.pageId,
+      optional: false,
+      to: r.page.id,
+    }),
+    textWidget: r.one.textWidget(),
+  },
+  widgetAudit: {
+    page: r.one.page({
+      from: r.widgetAudit.pageId,
+      optional: false,
+      to: r.page.id,
+    }),
+    widget: r.one.widget({
+      from: r.widgetAudit.widgetId,
+      optional: false,
+      to: r.widget.id,
+    }),
   },
 }));
