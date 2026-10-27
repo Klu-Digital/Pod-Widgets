@@ -8,6 +8,7 @@ import {
 
 import AppBreadcrumbs from "@/components/app-breadcrumbs";
 import AppSidebar from "@/components/app-sidebar";
+import { IdentityBadge } from "@/components/identity-dialog";
 import { ModeToggle } from "@/components/mode-toggle";
 
 const AppLayout = () => (
@@ -20,7 +21,8 @@ const AppLayout = () => (
           <SidebarTrigger className="-ms-1" />
           <Separator className="me-2 h-4" orientation="vertical" />
           <AppBreadcrumbs />
-          <div className="ms-auto">
+          <div className="ms-auto flex items-center gap-3">
+            <IdentityBadge />
             <ModeToggle />
           </div>
         </header>
