@@ -20,7 +20,7 @@ pnpm dev
 
 `pnpm db:deploy` is the composite one — drizzle migrations, then any pending post-migration scripts. Running only `pnpm db:migrate` skips the scripts, so reference rows such as the default page never appear.
 
-Ports are deliberately not all upstream defaults; see the table in the README.
+Ports are deliberately not all upstream defaults; see the table in [docs/reference.md](docs/reference.md#ports).
 
 ## Working on it
 
@@ -69,7 +69,7 @@ Post-migration scripts are for data, because a migration holds schema changes on
 
 ## Conventions
 
-**Comments explain why, not what.** The existing ones are long where the reasoning is non-obvious — read a few before writing your own. Anything that took an afternoon to work out belongs in a comment or in the README's "things that bite" lists, because the next person will otherwise spend the same afternoon.
+**Comments explain why, not what.** The existing ones are long where the reasoning is non-obvious — read a few before writing your own. Anything that took an afternoon to work out belongs in a comment or in the "things that bite" lists in docs/reference.md, because the next person will otherwise spend the same afternoon.
 
 **Add an API procedure at the right rung of the ladder** in `packages/api/src/procedures.ts`: `publicProcedure` for reads, `mutationProcedure` when it writes. A mutation with a side effect (a cache purge, a notification) must run it through `context.afterCommit(...)`, never inline — the handler runs inside an open transaction.
 

@@ -8,7 +8,7 @@ import {
   DialogPopup,
   DialogTitle,
 } from "@trumpet-pods/ui/components/dialog";
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { SyntheticEvent } from "react";
 
 import { TextField } from "@/components/text-field";
@@ -20,6 +20,7 @@ const NameForm = ({ onSaved }: { onSaved?: () => void }) => {
   const { identity, saveName } = useIdentity();
   const [name, setName] = useState(identity?.name ?? "");
   const [error, setError] = useState<string>();
+  const formId = useId();
 
   const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,7 +41,7 @@ const NameForm = ({ onSaved }: { onSaved?: () => void }) => {
         </DialogDescription>
       </DialogHeader>
       <DialogPanel>
-        <form onSubmit={submit}>
+        <form id={formId} onSubmit={submit}>
           <TextField
             autoComplete="name"
             autoFocus
@@ -56,7 +57,10 @@ const NameForm = ({ onSaved }: { onSaved?: () => void }) => {
         </form>
       </DialogPanel>
       <DialogFooter>
-        <Button type="submit">Save</Button>
+        {/* The footer is outside the form, so `form` is what makes Save submit it. */}
+        <Button form={formId} type="submit">
+          Save
+        </Button>
       </DialogFooter>
     </>
   );

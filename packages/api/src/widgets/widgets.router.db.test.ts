@@ -56,6 +56,29 @@ describe("widgets", () => {
     );
   });
 
+  it("stores and returns a 1000-character text intact", async () => {
+    const { id: pageId } = await newPage();
+    const created = await call(
+      appRouter.widgets.create,
+      { pageId, type: "text" },
+      { context }
+    );
+    const text = "0123456789".repeat(100);
+
+    await call(
+      appRouter.widgets.updateContent,
+      { content: doc(text), id: created.id },
+      { context }
+    );
+    const [stored] = await call(
+      appRouter.widgets.list,
+      { pageId },
+      { context }
+    );
+
+    expect(stored).toMatchObject({ content: doc(text) });
+  });
+
   it("keeps content independent between widgets on one page", async () => {
     const { id: pageId } = await newPage();
     const first = await call(

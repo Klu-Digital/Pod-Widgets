@@ -113,4 +113,4 @@ Both tiers send `Strict-Transport-Security` with `includeSubDomains`. Think twic
 
 ## Object storage
 
-The variables are in the root README's [Object storage](../README.md#object-storage) section.
+The variables are in the [Object storage](reference.md#object-storage) section.

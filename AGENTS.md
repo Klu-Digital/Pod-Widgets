@@ -46,7 +46,7 @@ Run one file: `pnpm exec vp test run --project unit path/to/file.test.ts`.
 
 ## Invariants worth knowing before editing
 
-These are the ones that cost real time to rediscover. The README carries the fuller writeups under each feature's "things that bite".
+These are the ones that cost real time to rediscover. [docs/reference.md](docs/reference.md) carries the fuller writeups under each feature's "things that bite".
 
 **Side effects inside a mutation must go through `context.afterCommit()`.** `mutationProcedure` wraps handlers in `db.transaction(...)`, so a side effect called inline (a cache purge, a notification) acts on a write the transaction may still roll back. The `.use(afterCommit).use(transaction)` order in `packages/api/src/procedures.ts` is load-bearing — reversing it silently reintroduces the bug.
 
@@ -182,10 +182,10 @@ Oxlint catches most of the above automatically. Spend your own attention on:
 
 Each of these has a README section carrying the reasoning the summary above compresses:
 
-- [Object storage](README.md#object-storage), [Side effects after a mutation commits](README.md#side-effects-after-a-mutation-commits)
-- [Security headers](README.md#security-headers), [The web image is environment-agnostic](README.md#the-web-image-is-environment-agnostic)
-- [Page titles and breadcrumbs](README.md#page-titles-and-breadcrumbs), [UI Customization](README.md#ui-customization)
-- [Post-migration scripts](README.md#post-migration-scripts) and its [authoring guide](packages/db/src/dev-scripts/post-migrate/README.md)
+- [Object storage](docs/reference.md#object-storage), [Side effects after a mutation commits](docs/reference.md#side-effects-after-a-mutation-commits)
+- [Security headers](docs/reference.md#security-headers), [The web image is environment-agnostic](docs/reference.md#the-web-image-is-environment-agnostic)
+- [Page titles and breadcrumbs](docs/reference.md#page-titles-and-breadcrumbs), [UI Customization](docs/reference.md#ui-customization)
+- [Post-migration scripts](docs/reference.md#post-migration-scripts) and its [authoring guide](packages/db/src/dev-scripts/post-migrate/README.md)
 - [docs/self-hosting.md](docs/self-hosting.md) — operator view: images, proxies, optional services
 - [apps/server/README.md](apps/server/README.md) — boot migrations, health and shutdown
 - [docs/adr/](docs/adr/) — the decisions behind the invariants above
