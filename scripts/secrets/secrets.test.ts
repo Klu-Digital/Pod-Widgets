@@ -35,7 +35,7 @@ const CANARY = "THIS_MUST_NEVER_APPEAR";
 
 const makeFixture = (): string => {
   const root = mkdtempSync(path.join(os.tmpdir(), "k22i-secrets-"));
-  for (const app of ["native", "server", "web", "workers"]) {
+  for (const app of ["server", "web", "workers"]) {
     const directory = path.join(root, "apps", app);
     mkdirSync(directory, { recursive: true });
     cpSync(
@@ -70,7 +70,7 @@ describe("local setup", () => {
     expect(second).not.toBe(first);
   });
 
-  it("creates env files and preserves an existing auth secret", () => {
+  it("creates env files and preserves an existing generated secret", () => {
     const root = makeFixture();
     try {
       const serverEnv = path.join(root, "apps/server/.env");
@@ -79,8 +79,8 @@ describe("local setup", () => {
       writeFileSync(
         serverEnv,
         readFileSync(serverEnv, "utf-8").replace(
-          "BETTER_AUTH_SECRET=",
-          `BETTER_AUTH_SECRET=${existing}`
+          "# PROMETHEUS_METRICS_TOKEN=",
+          `PROMETHEUS_METRICS_TOKEN=${existing}`
         )
       );
 
@@ -88,7 +88,7 @@ describe("local setup", () => {
 
       expect(result.createdFiles).toContain("apps/workers/.env");
       expect(readFileSync(serverEnv, "utf-8")).toContain(
-        `BETTER_AUTH_SECRET=${existing}`
+        `PROMETHEUS_METRICS_TOKEN=${existing}`
       );
       expect(readFileSync(path.join(root, "apps/web/.env"), "utf-8")).toContain(
         "VITE_SERVER_URL=/"
@@ -109,11 +109,11 @@ describe("local setup", () => {
 
       expect(second.generated).toEqual([]);
       expect(readFileSync(serverEnv, "utf-8")).toBe(before);
-      const secret = before.match(/^BETTER_AUTH_SECRET=(?<value>.+)$/mu)?.groups
-        ?.value;
+      const secret = before.match(/^PROMETHEUS_METRICS_TOKEN=(?<value>.+)$/mu)
+        ?.groups?.value;
       expect(secret).toBeTruthy();
       expect(output).not.toContain(secret ?? "missing-secret");
-      expect(output).not.toMatch(/BETTER_AUTH_SECRET=|DATABASE_URL=/u);
+      expect(output).not.toMatch(/PROMETHEUS_METRICS_TOKEN=|DATABASE_URL=/u);
     } finally {
       cleanup(root);
     }
@@ -123,14 +123,14 @@ describe("local setup", () => {
     const root = makeFixture();
     try {
       const result = checkLocalEnvironment(root);
-      const auth = result.items.find(
-        (item) => item.name === "BETTER_AUTH_SECRET"
+      const database = result.items.find(
+        (item) => item.name === "DATABASE_URL"
       );
       const posthog = result.items.find(
         (item) => item.name === "POSTHOG_PROJECT_API_KEY"
       );
 
-      expect(auth?.status).toBe("missing");
+      expect(database?.status).toBe("missing");
       expect(posthog?.status).toBe("optional");
       expect(result.ready).toBe(false);
     } finally {
@@ -168,7 +168,6 @@ describe("manifest", () => {
       "server.ts",
       "workers.ts",
       "web.ts",
-      "native.ts",
     ];
     const declared = new Set<string>();
     for (const file of schemaFiles) {
@@ -213,22 +212,17 @@ describe("manifest", () => {
     }
   });
 
-  it("keeps Better Auth configuration away from the workers runtime", () => {
-    for (const name of [
-      "BETTER_AUTH_SECRET",
-      "BETTER_AUTH_URL",
-      "CORS_ORIGIN",
-    ]) {
-      const entry = configManifest.find((candidate) => candidate.name === name);
-      expect(entry?.targets, name).not.toContain("dokploy-workers");
-      expect(entry?.targets, name).not.toContain("local-workers");
-    }
+  it("keeps the API's CORS origin away from the workers runtime", () => {
+    const entry = configManifest.find(
+      (candidate) => candidate.name === "CORS_ORIGIN"
+    );
+    expect(entry?.targets).not.toContain("dokploy-workers");
+    expect(entry?.targets).not.toContain("local-workers");
 
     const workersSchema = readFileSync(
       path.join(repoRoot, "packages/env/src/workers.ts"),
       "utf-8"
     );
-    expect(workersSchema).not.toContain("BETTER_AUTH");
     expect(workersSchema).not.toContain("CORS_ORIGIN");
   });
 
@@ -245,13 +239,12 @@ describe("manifest", () => {
     expect(project?.targets).not.toContain("github-repository");
   });
 
-  it("does not expose secrets to browser or native builds", () => {
+  it("does not expose secrets to browser builds", () => {
     for (const entry of configManifest) {
       if (entry.kind === "config") {
         continue;
       }
       expect(entry.targets, entry.name).not.toContain("local-web");
-      expect(entry.targets, entry.name).not.toContain("local-native");
     }
   });
 });
@@ -291,13 +284,13 @@ describe("write planning", () => {
 
   it("plans nothing for a fully configured name", () => {
     const state = emptyRemoteState();
-    for (const write of destinationsFor("BETTER_AUTH_SECRET", "production")) {
+    for (const write of destinationsFor("CORS_ORIGIN", "production")) {
       if (write.target === "dokploy-server") {
         state.dokployServer.add(write.name);
       }
     }
 
-    expect(planWrites(["BETTER_AUTH_SECRET"], "production", state)).toEqual([]);
+    expect(planWrites(["CORS_ORIGIN"], "production", state)).toEqual([]);
   });
 
   it("routes non-secret configuration to variables and credentials to secrets", () => {
@@ -341,7 +334,7 @@ describe("write planning", () => {
   it("renders destinations without any value", () => {
     const state = emptyRemoteState();
     const writes = planWrites(
-      ["DOKPLOY_TOKEN", "DOKPLOY_URL", "BETTER_AUTH_SECRET"],
+      ["DOKPLOY_TOKEN", "DOKPLOY_URL", "DATABASE_URL"],
       "staging",
       state
     );
@@ -354,11 +347,10 @@ describe("write planning", () => {
     expect(rendered).not.toContain("=");
   });
 
-  it("derives all three URLs from one origin", () => {
+  it("derives both URLs from one origin", () => {
     const derived = deriveUrls("https://staging.example.com/");
 
     expect(derived).toEqual({
-      BETTER_AUTH_URL: "https://staging.example.com",
       CORS_ORIGIN: "https://staging.example.com",
       SMOKE_URL: "https://staging.example.com",
     });
@@ -371,7 +363,6 @@ describe("write planning", () => {
     );
 
     expect(derived.CORS_ORIGIN).toBe("https://staging.example.com");
-    expect(derived.BETTER_AUTH_URL).toBe("https://api.staging.example.com");
     expect(derived.SMOKE_URL).toBe("https://api.staging.example.com");
   });
 });
@@ -530,7 +521,7 @@ describe("deployment check", () => {
     );
 
     expect(rendered).not.toContain(CANARY);
-    expect(rendered).not.toMatch(/DATABASE_URL=|BETTER_AUTH_SECRET=/u);
+    expect(rendered).not.toMatch(/DATABASE_URL=|PROMETHEUS_METRICS_TOKEN=/u);
     expect(rendered).toContain("k22i staging");
   });
 });

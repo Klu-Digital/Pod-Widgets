@@ -53,7 +53,7 @@ pnpm test:watch
 
 `db` tests get a real Postgres via testcontainers, migrated once per run, and each worker gets its own numbered Redis logical database that is flushed between tests. Point the suite at a Redis you care about and it will erase it.
 
-Reach for a `.db.test.ts` when the thing under test is the SQL, the transaction boundary, or a better-auth hook. Everything else is cheaper and faster as a unit test — see `apps/server/src/metrics.test.ts` for the module-mocking pattern that gets around `@k22i/env/server` freezing its config at import.
+Reach for a `.db.test.ts` when the thing under test is the SQL or the transaction boundary. Everything else is cheaper and faster as a unit test — see `apps/server/src/metrics.test.ts` for the module-mocking pattern that gets around `@k22i/env/server` freezing its config at import.
 
 ## Database changes
 
@@ -71,7 +71,7 @@ Post-migration scripts are for data, because a migration holds schema changes on
 
 **Comments explain why, not what.** The existing ones are long where the reasoning is non-obvious — read a few before writing your own. Anything that took an afternoon to work out belongs in a comment or in the README's "things that bite" lists, because the next person will otherwise spend the same afternoon.
 
-**Add an API procedure at the right rung of the ladder** in `packages/api/src/procedures.ts`: `publicProcedure` → `protectedProcedure` → `orgProcedure`, and the `mutationProcedure` variants when it writes. A mutation that invalidates a cache must do it through `context.afterCommit(...)`, never inline — the handler runs inside an open transaction.
+**Add an API procedure at the right rung of the ladder** in `packages/api/src/procedures.ts`: `publicProcedure` for reads, `mutationProcedure` when it writes. A mutation that invalidates a cache must do it through `context.afterCommit(...)`, never inline — the handler runs inside an open transaction.
 
 **Fail open on optional infrastructure.** Redis, object storage and the queue are all optional, and every caller degrades rather than erroring. Keep it that way: a caching layer that can take the site down is worse than no caching layer.
 
@@ -79,4 +79,4 @@ Post-migration scripts are for data, because a migration holds schema changes on
 
 ## Pull requests
 
-Keep the branch focused, make sure `pnpm check`, `pnpm check-types` and `pnpm test` all pass, and say in the description what you verified by hand — particularly for anything touching auth, migrations, or the Docker setup, where the tests cannot see the whole picture.
+Keep the branch focused, make sure `pnpm check`, `pnpm check-types` and `pnpm test` all pass, and say in the description what you verified by hand — particularly for anything touching migrations, or the Docker setup, where the tests cannot see the whole picture.

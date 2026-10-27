@@ -40,15 +40,11 @@ const isUrl = (value: string): boolean => {
 };
 
 const isValid = (name: string, value: string): boolean => {
-  if (name === "BETTER_AUTH_SECRET") {
-    return value.length >= 32;
-  }
   if (name === "POSTHOG_PROJECT_API_KEY") {
     return value.startsWith("phc_");
   }
   if (
     [
-      "BETTER_AUTH_URL",
       "CORS_ORIGIN",
       "DOKPLOY_URL",
       "POSTHOG_HOST",

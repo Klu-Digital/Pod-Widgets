@@ -5,7 +5,7 @@ import { serve } from "@hono/node-server";
 import type { ServerType } from "@hono/node-server";
 import { env } from "@k22i/env/server";
 // Initializes the logger at module scope, so it must come before ./app, which
-// pulls in @k22i/auth and @k22i/db. Keep this import first.
+// pulls in @k22i/db. Keep this import first.
 import {
   exitOnCrash,
   log,

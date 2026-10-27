@@ -25,7 +25,7 @@ const rootRoute = createRootRoute({
 // A pathless layout with no title of its own — it should contribute nothing.
 const layoutRoute = createRoute({
   getParentRoute: () => rootRoute,
-  id: "_auth",
+  id: "_app",
 });
 
 const adminRoute = createRoute({
@@ -47,8 +47,7 @@ const userRoute = createRoute({
   component: () => null,
   getParentRoute: () => usersRoute,
   path: "/$userId",
-  // `loader` above `head` — see `routes/_auth/admin/users.$userId.tsx` for why
-  // the reverse order types `loaderData` as `never`.
+  // `loader` above `head` — the reverse order types `loaderData` as `never`.
   loader: ({ params }) =>
     Promise.resolve(params.userId === "1" ? { name: "Ada Lovelace" } : null),
   head: ({ loaderData }) => ({

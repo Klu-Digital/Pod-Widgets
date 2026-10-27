@@ -1,11 +1,11 @@
-import { file } from "@k22i/db/schema/index";
-import { getSessionFor, getTestDb, signUpTestUser } from "@k22i/testing";
+import { featureFlag } from "@k22i/db/schema/feature-flags";
+import { getTestDb } from "@k22i/testing";
 import { call } from "@orpc/server";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vite-plus/test";
 
 import type { Context } from "./context";
-import { orgMutationProcedure } from "./procedures";
+import { mutationProcedure } from "./procedures";
 
 /**
  * The queued task reads the row back on a different pool connection from the
@@ -13,13 +13,7 @@ import { orgMutationProcedure } from "./procedures";
  * committed.
  */
 
-const contextFor = async (headers: Headers): Promise<Context> =>
-  ({
-    auth: null,
-    db: getTestDb(),
-    log: undefined,
-    session: await getSessionFor(headers),
-  }) as unknown as Context;
+const context = { db: getTestDb(), log: undefined } as unknown as Context;
 
 /**
  * Writes one row, then queues a task reporting whether it was visible from
@@ -29,35 +23,26 @@ const writeThenQueue = (
   report: (seenFromOutside: boolean) => void,
   afterQueueing?: () => void
 ) =>
-  orgMutationProcedure.handler(async ({ context }) => {
-    const key = `org/${context.organizationId}/${crypto.randomUUID()}/photo.png`;
+  mutationProcedure.handler(async ({ context: ctx }) => {
+    const name = `FF__${crypto.randomUUID()}`;
 
-    await context.db.insert(file).values({
-      bucket: "test-bucket",
-      contentType: "image/png",
-      key,
-      name: "photo.png",
-      organizationId: context.organizationId,
-      userId: context.session.user.id,
-    });
+    await ctx.db.insert(featureFlag).values({ enabled: true, name });
 
-    context.afterCommit(async () => {
+    ctx.afterCommit(async () => {
       const rows = await getTestDb()
         .select()
-        .from(file)
-        .where(eq(file.key, key));
+        .from(featureFlag)
+        .where(eq(featureFlag.name, name));
       report(rows.length === 1);
     });
 
     afterQueueing?.();
-    return { key };
+    return { name };
   });
 
 describe("afterCommit", () => {
   it("runs queued work, and only once the transaction has committed", async () => {
     const seen: boolean[] = [];
-    const { headers } = await signUpTestUser();
-    const context = await contextFor(headers);
 
     await call(
       writeThenQueue((seenFromOutside) => seen.push(seenFromOutside)),
@@ -73,8 +58,6 @@ describe("afterCommit", () => {
 
   it("does not run queued work when the transaction rolls back", async () => {
     const seen: boolean[] = [];
-    const { headers } = await signUpTestUser();
-    const context = await contextFor(headers);
 
     await expect(
       call(
@@ -90,14 +73,11 @@ describe("afterCommit", () => {
     ).rejects.toThrow("boom");
 
     expect(seen).toEqual([]);
-    expect(await getTestDb().select().from(file)).toHaveLength(0);
+    expect(await getTestDb().select().from(featureFlag)).toHaveLength(0);
   });
 
   it("does not fail the mutation when a queued task throws", async () => {
-    const { headers } = await signUpTestUser();
-    const context = await contextFor(headers);
-
-    const procedure = orgMutationProcedure.handler(({ context: ctx }) => {
+    const procedure = mutationProcedure.handler(({ context: ctx }) => {
       ctx.afterCommit(() => Promise.reject(new Error("invalidation failed")));
       return { ok: true };
     });

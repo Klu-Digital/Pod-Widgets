@@ -35,7 +35,7 @@ COPY apps/web/nginx.conf.template /etc/nginx/templates/default.conf.template
 # — enough for the API now that it is same-origin, but not for the object storage
 # endpoint, so uploads need this set wherever this image is deployed.
 ENV CSP_CONNECT_SRC=""
-# Where nginx proxies /api/auth and /rpc. Needs a value for the same reason
+# Where nginx proxies /rpc. Needs a value for the same reason
 # CSP_CONNECT_SRC does — envsubst leaves an *unset* variable literal and nginx
 # then refuses to start on `unknown "server_upstream" variable` — but unlike the
 # CSP an empty upstream is simply a broken proxy, so the default is the compose

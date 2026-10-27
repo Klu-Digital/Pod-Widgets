@@ -1,6 +1,8 @@
 ---
-status: accepted
+status: superseded
 ---
+
+Superseded for this project by #8 (auth removed).
 
 # k22i sends no email; recovery is admin-driven
 

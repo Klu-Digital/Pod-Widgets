@@ -1,6 +1,5 @@
 import type { AppRouterClient } from "@k22i/api/routers/index";
 import type { EvlogVariables } from "@k22i/observability/hono";
-import { signUpTestUser } from "@k22i/testing";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { SimpleCsrfProtectionLinkPlugin } from "@orpc/client/plugins";
@@ -12,18 +11,9 @@ import { mountOrpc } from "./orpc";
 
 const app = createApp();
 
-const clientWithHeaders = (headers?: Headers): AppRouterClient => {
+const client = (): AppRouterClient => {
   const link = new RPCLink({
-    fetch: async (request) => {
-      if (!headers) {
-        return await app.request(request);
-      }
-      const merged = new Headers(request.headers);
-      for (const [key, value] of headers) {
-        merged.set(key, value);
-      }
-      return await app.request(new Request(request, { headers: merged }));
-    },
+    fetch: async (request) => await app.request(request),
     plugins: [new SimpleCsrfProtectionLinkPlugin()],
     url: "http://localhost/rpc",
   });
@@ -79,13 +69,10 @@ describe("POST /rpc body limit", () => {
 });
 
 describe("POST /rpc CSRF header", () => {
-  it("refuses a cookie-bearing call without it, as a cross-site form would send", async () => {
-    const { headers } = await signUpTestUser();
-    headers.set("content-type", "application/json");
-
-    const response = await app.request("/rpc/privateData", {
+  it("refuses a call without it, as a cross-site form would send", async () => {
+    const response = await app.request("/rpc/healthCheck", {
       body: JSON.stringify({}),
-      headers,
+      headers: { "content-type": "application/json" },
       method: "POST",
     });
 
@@ -116,29 +103,8 @@ describe("/api-reference", () => {
 
 describe("POST /rpc/healthCheck", () => {
   it("returns OK over real HTTP through the RPC handler", async () => {
-    const client = clientWithHeaders();
-
-    const result = await client.healthCheck();
+    const result = await client().healthCheck();
 
     expect(result).toBe("OK");
-  });
-});
-
-describe("POST /rpc/privateData", () => {
-  it("returns 401 without auth", async () => {
-    const client = clientWithHeaders();
-
-    await expect(client.privateData()).rejects.toMatchObject({
-      code: "UNAUTHORIZED",
-    });
-  });
-
-  it("returns the signed-up user's email when authenticated", async () => {
-    const { user, headers } = await signUpTestUser();
-    const client = clientWithHeaders(headers);
-
-    const result = await client.privateData();
-
-    expect(result.user?.email).toBe(user.email);
   });
 });

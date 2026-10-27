@@ -1,6 +1,8 @@
 ---
-status: accepted
+status: superseded
 ---
+
+Superseded for this project by #8 (auth removed).
 
 # The database enforces tenant integrity
 

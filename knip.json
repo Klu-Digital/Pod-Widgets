@@ -7,9 +7,6 @@
       "entry": ["scripts/**/*.ts"],
       "ignoreDependencies": ["rolldown"]
     },
-    "apps/native": {
-      "ignore": ["**"]
-    },
     "apps/web": {
       "entry": ["src/**/*.test.{ts,tsx}"],
       "ignoreDependencies": ["tailwindcss"],
@@ -20,16 +17,19 @@
     "packages/api": {
       "includeEntryExports": true
     },
-    "packages/auth": {
-      "includeEntryExports": true
-    },
     "packages/db": {
       "ignoreDependencies": ["fishery"]
     },
     "packages/queue": {
+      "ignoreIssues": {
+        "src/index.ts": ["exports", "types"]
+      },
       "includeEntryExports": true
     },
     "packages/storage": {
+      "ignoreIssues": {
+        "src/**": ["exports", "types"]
+      },
       "includeEntryExports": true
     },
     "packages/ui": {

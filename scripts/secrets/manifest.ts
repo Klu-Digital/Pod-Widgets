@@ -4,7 +4,6 @@ export type ConfigTarget =
   | "local-server"
   | "local-workers"
   | "local-web"
-  | "local-native"
   | "github-repository"
   | "github-staging"
   | "github-production"
@@ -21,49 +20,6 @@ export interface ConfigEntry {
 
 /** Setup metadata only. Runtime validation remains in packages/env. */
 export const configManifest = [
-  {
-    description: "Whether Better Auth rate limiting is enabled",
-    kind: "config",
-    name: "AUTH_RATE_LIMIT_ENABLED",
-    required: false,
-    targets: ["local-server", "dokploy-server"],
-  },
-  {
-    description: "Maximum requests per rate-limit window",
-    kind: "config",
-    name: "AUTH_RATE_LIMIT_MAX",
-    required: false,
-    targets: ["local-server", "dokploy-server"],
-  },
-  {
-    description: "Rate-limit window in seconds",
-    kind: "config",
-    name: "AUTH_RATE_LIMIT_WINDOW",
-    required: false,
-    targets: ["local-server", "dokploy-server"],
-  },
-  {
-    description: "Signs Better Auth sessions and tokens",
-    kind: "generated-secret",
-    name: "BETTER_AUTH_SECRET",
-    required: true,
-    targets: ["local-server", "dokploy-server"],
-  },
-  {
-    description: "Public URL used by Better Auth",
-    kind: "config",
-    name: "BETTER_AUTH_URL",
-    required: true,
-    targets: ["local-server", "dokploy-server"],
-  },
-  {
-    description:
-      "Open self-service sign-up; off means first account and invite links only",
-    kind: "config",
-    name: "ALLOW_SIGNUP",
-    required: false,
-    targets: ["local-server", "dokploy-server"],
-  },
   {
     description: "Browser origin allowed to call the API",
     kind: "config",
@@ -117,13 +73,6 @@ export const configManifest = [
     name: "DOKPLOY_WORKERS_APPLICATION_ID",
     required: true,
     targets: ["github-staging", "github-production"],
-  },
-  {
-    description: "API origin used by the native app",
-    kind: "config",
-    name: "EXPO_PUBLIC_SERVER_URL",
-    required: true,
-    targets: ["local-native"],
   },
   {
     description: "Runtime environment name",

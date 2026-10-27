@@ -17,6 +17,10 @@ export const domainErrors = {
   UNAUTHORIZED: {},
 };
 
-/** `notFound("File")` → NOT_FOUND "File not found". Another tenant's id reads as missing too. */
+/**
+ * `notFound("File")` → NOT_FOUND "File not found".
+ *
+ * @public
+ */
 export const notFound = (entity: string) =>
   new ORPCError("NOT_FOUND", { message: `${entity} not found` });

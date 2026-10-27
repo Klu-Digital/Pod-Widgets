@@ -472,8 +472,8 @@ const collectUrls = async (
   environment: DeploymentEnvironment
 ): Promise<void> => {
   console.log("\n5/5 — Application URLs");
-  const outstanding = ["BETTER_AUTH_URL", "CORS_ORIGIN", "SMOKE_URL"].filter(
-    (name) => needs(state, name, environment)
+  const outstanding = ["CORS_ORIGIN", "SMOKE_URL"].filter((name) =>
+    needs(state, name, environment)
   );
   if (outstanding.length === 0) {
     console.log("✓ already configured");
@@ -482,7 +482,7 @@ const collectUrls = async (
 
   const webUrl = await requiredValue("Public application URL");
   // The deployed topology puts the SPA and the API on one origin — nginx in the
-  // web image proxies /api/auth and /rpc — so one answer usually covers both.
+  // web image proxies /rpc — so one answer usually covers both.
   const apiUrl = (await confirm("Is the API served on a different hostname?"))
     ? await requiredValue("Public API URL")
     : undefined;

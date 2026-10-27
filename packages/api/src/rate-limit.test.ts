@@ -27,11 +27,9 @@ beforeEach(() => {
 /** Mirrors the fake context in `routers/feature-flags.test.ts`. */
 const makeContext = (overrides: Partial<Context> = {}): Context =>
   ({
-    auth: null,
     db: {},
     ip: undefined,
     log: undefined,
-    session: null,
     ...overrides,
   }) as unknown as Context;
 
@@ -123,7 +121,7 @@ describe("rateLimit", () => {
     expect(error).toBeInstanceOf(ORPCError);
   });
 
-  it("lets a custom `key` override the default session/IP identity", async () => {
+  it("lets a custom `key` override the default IP identity", async () => {
     redisMock.client.mockReturnValue(createFakeRedis());
     const proc = procedure({ key: () => "shared-key", limit: 1, window: 60 });
     // Two contexts that would otherwise be independent identities...

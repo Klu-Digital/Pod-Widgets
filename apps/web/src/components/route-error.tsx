@@ -6,11 +6,11 @@ import type { FailureKind } from "@/utils/orpc";
 
 const COPY: Record<FailureKind, { body: string; title: string }> = {
   forbidden: {
-    body: "Ask an organization admin if you need access.",
+    body: "You may not have permission to view this.",
     title: "You don’t have access to this",
   },
   not_found: {
-    body: "It may have been deleted, or belong to another organization.",
+    body: "It may have been deleted, or never existed.",
     title: "We couldn’t find that",
   },
   unexpected: {
@@ -43,9 +43,7 @@ const RouteMessage = ({
   );
 };
 
-const BackToDashboard = () => (
-  <Button render={<Link to="/dashboard" />}>Back to dashboard</Button>
-);
+const BackHome = () => <Button render={<Link to="/" />}>Back home</Button>;
 
 export const RouteError = ({
   error,
@@ -59,17 +57,13 @@ export const RouteError = ({
 
   return (
     <RouteMessage kind={kind}>
-      {retryable ? (
-        <Button onClick={reset}>Try again</Button>
-      ) : (
-        <BackToDashboard />
-      )}
+      {retryable ? <Button onClick={reset}>Try again</Button> : <BackHome />}
     </RouteMessage>
   );
 };
 
 export const RouteNotFound = () => (
   <RouteMessage kind="not_found">
-    <BackToDashboard />
+    <BackHome />
   </RouteMessage>
 );

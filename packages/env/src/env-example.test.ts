@@ -71,12 +71,7 @@ describe(".env.example coverage", () => {
 
     // Exactly the vars with no schema default: commenting one out turns
     // `cp .env.example .env` into a server that refuses to boot.
-    for (const required of [
-      "BETTER_AUTH_SECRET",
-      "BETTER_AUTH_URL",
-      "CORS_ORIGIN",
-      "DATABASE_URL",
-    ]) {
+    for (const required of ["CORS_ORIGIN", "DATABASE_URL"]) {
       expect(uncommented, `${required} must not be commented out`).toContain(
         required
       );

@@ -12,14 +12,13 @@ export interface RateLimitOptions {
   limit: number;
   /** Window length in seconds. Fixed window, not sliding. */
   window: number;
-  /** Defaults to the session user, then the client IP. */
+  /** Defaults to the client IP. */
   key?: (context: Context) => string | undefined;
 }
 
 /**
- * Buckets by procedure path, and prefers the session id over `context.ip` — the
- * latter is only as trustworthy as `TRUSTED_PROXY_HOPS` makes it. Never fails
- * open on infrastructure: `countHit` counts in Redis when it answers and in an
+ * Buckets by procedure path, and keys on `context.ip`, which is only as
+ * trustworthy as `TRUSTED_PROXY_HOPS` makes it. Never fails open on infrastructure: `countHit` counts in Redis when it answers and in an
  * in-process window when it is unset or a command fails (per process, so looser
  * across replicas, but never off). Only an unattributable caller passes
  * uncounted. Alert on `ratelimit.fallback` and `redis.error`.
@@ -27,11 +26,7 @@ export interface RateLimitOptions {
 export const rateLimit = ({ limit, window, key }: RateLimitOptions) =>
   o.middleware(async ({ context, next, path }) => {
     const identity =
-      key?.(context) ??
-      (context.session?.user.id
-        ? `user:${context.session.user.id}`
-        : undefined) ??
-      (context.ip ? `ip:${context.ip}` : undefined);
+      key?.(context) ?? (context.ip ? `ip:${context.ip}` : undefined);
     if (!identity) {
       // unattributable caller — nothing to bucket
       return next();

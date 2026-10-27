@@ -77,10 +77,10 @@ const handlers: Handlers = {
 
 ## Enqueueing — the transaction rule
 
-**Pass `tx` only from a procedure that actually has a transaction.** That means `mutationProcedure` and `orgMutationProcedure`, whose middleware rebinds `context.db` to the running `tx`. It does _not_ include `protectedProcedure` or `orgProcedure`.
+**Pass `tx` only from a procedure that actually has a transaction.** That means `mutationProcedure`, whose middleware rebinds `context.db` to the running `tx`. It does _not_ include `publicProcedure`.
 
 ```ts
-processUpload: orgMutationProcedure
+processUpload: mutationProcedure
   .input(z.object({ fileId: z.uuid() }))
   .handler(async ({ context, input }) => {
     const [row] = await context.db

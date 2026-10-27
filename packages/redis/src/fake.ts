@@ -1,7 +1,6 @@
 /**
  * An in-memory ioredis stand-in, for unit tests that need cache or rate-limit
- * behaviour. Lives here, not in `@k22i/testing`, which depends on `@k22i/auth`
- * -> `@k22i/redis`. Imports nothing from `@k22i/*`: it loads inside `vi.mock`
+ * behaviour. Imports nothing from `@k22i/*`: it loads inside `vi.mock`
  * factories, where an `@k22i/env/shared-server` import would freeze `env` against
  * placeholders. Only the commands this repo issues.
  */

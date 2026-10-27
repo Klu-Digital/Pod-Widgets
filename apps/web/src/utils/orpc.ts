@@ -45,7 +45,7 @@ export const errorMessage = (error: unknown): string => {
   if (error instanceof TypeError) {
     return "Can’t reach the server. Check your connection.";
   }
-  // Thrown by this app's own code (uploads, better-auth wrappers).
+  // Thrown by this app's own code (client-side helpers).
   if (error instanceof Error) {
     return error.message;
   }

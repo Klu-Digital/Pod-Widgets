@@ -11,7 +11,7 @@ const USAGE = `Usage:
 
 Renames the project throughout the repo: the npm scope (@k22i/*), the workspace
 package names, the Compose project and container names, the Postgres database,
-the Expo app slug and deep-link scheme, and every mention in documentation and
+and every mention in documentation and
 comments.
 
 The current name is read from the root package.json, so this is re-runnable
@@ -43,7 +43,6 @@ const UNTRACKED_CANDIDATES = [
   ".env",
   "apps/server/.env",
   "apps/web/.env",
-  "apps/native/.env",
   "apps/workers/.env",
 ];
 
@@ -191,35 +190,7 @@ const reportLeftovers = (
   }
 };
 
-/**
- * The blanket replacement leaves an invalid `com.anonymous.<new-name>` for a
- * hyphenated name, and Gradle rejects the build rather than warning. Returns
- * the substituted identifier when repaired.
- */
-const fixBundleIdentifiers = (newName: string): string | undefined => {
-  if (!newName.includes("-")) {
-    return undefined;
-  }
-
-  const appJsonPath = path.join(REPO_ROOT, "apps/native/app.json");
-  if (!existsSync(appJsonPath)) {
-    return undefined;
-  }
-
-  const safe = newName.replaceAll("-", "");
-  const source = readFileSync(appJsonPath, "utf-8");
-  const repaired = source.replaceAll(`.${newName}"`, `.${safe}"`);
-  if (repaired !== source) {
-    writeFileSync(appJsonPath, repaired);
-  }
-
-  return safe;
-};
-
-const printNextSteps = (
-  bundleId: string | undefined,
-  newName: string
-): void => {
+const printNextSteps = (): void => {
   console.log(
     "\nNext:\n" +
       "  1. pnpm install          — the workspace package names changed, so the\n" +
@@ -229,16 +200,8 @@ const printNextSteps = (
       "                             container recreates it under the new name.\n" +
       "  3. pnpm db:deploy        — rebuild the schema in the new database.\n" +
       "  4. Search for anything the token rule could not reach: an icon, a\n" +
-      "     display name in apps/native/app.json, the description in\n" +
-      "     apps/web/src/routes/__root.tsx."
+      "     display name, the description in apps/web/src/routes/__root.tsx."
   );
-
-  if (bundleId) {
-    console.log(
-      `\nNote: Android packages and iOS bundle identifiers cannot contain hyphens,\n` +
-        `so those were set to "${bundleId}" rather than "${newName}".`
-    );
-  }
 };
 
 /** Parses argv and applies every guard; returns null (after printing why) if the run should stop. */
@@ -327,7 +290,7 @@ const main = (): void => {
     return;
   }
 
-  printNextSteps(fixBundleIdentifiers(newName), newName);
+  printNextSteps();
 };
 
 main();
