@@ -6,8 +6,7 @@ export type DeploymentEnvironment = "staging" | "production";
 export type WriteTarget =
   | "github-secret"
   | "github-variable"
-  | "dokploy-server"
-  | "dokploy-workers";
+  | "dokploy-server";
 
 export interface PlannedWrite {
   name: string;
@@ -19,7 +18,6 @@ export interface PlannedWrite {
 /** Names already present remotely. Secret VALUES are never read back. */
 export interface RemoteState {
   dokployServer: Set<string>;
-  dokployWorkers: Set<string>;
   githubRepositorySecrets: Set<string>;
   githubRepositoryVariables: Set<string>;
   githubSecrets: Set<string>;
@@ -28,7 +26,6 @@ export interface RemoteState {
 
 export const emptyRemoteState = (): RemoteState => ({
   dokployServer: new Set(),
-  dokployWorkers: new Set(),
   githubRepositorySecrets: new Set(),
   githubRepositoryVariables: new Set(),
   githubSecrets: new Set(),
@@ -76,18 +73,12 @@ export const destinationsFor = (
   if (targets.includes("dokploy-server")) {
     writes.push({ name, scope: "server", secret, target: "dokploy-server" });
   }
-  if (targets.includes("dokploy-workers")) {
-    writes.push({ name, scope: "workers", secret, target: "dokploy-workers" });
-  }
   return writes;
 };
 
 const alreadyPresent = (write: PlannedWrite, remote: RemoteState): boolean => {
   if (write.target === "dokploy-server") {
     return remote.dokployServer.has(write.name);
-  }
-  if (write.target === "dokploy-workers") {
-    return remote.dokployWorkers.has(write.name);
   }
   if (write.scope === "repository") {
     return write.secret
@@ -115,7 +106,6 @@ export const planWrites = (
 
 const GROUP_TITLES: Record<WriteTarget, string> = {
   "dokploy-server": "Dokploy server",
-  "dokploy-workers": "Dokploy workers",
   "github-secret": "GitHub Secrets",
   "github-variable": "GitHub Variables",
 };
@@ -124,7 +114,6 @@ const GROUP_ORDER: WriteTarget[] = [
   "github-secret",
   "github-variable",
   "dokploy-server",
-  "dokploy-workers",
 ];
 
 /** Names and destinations only — never a value. */

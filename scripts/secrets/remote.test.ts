@@ -211,7 +211,7 @@ describe("Dokploy adapter", () => {
       {
         applications: [
           { applicationId: "srv-1", name: "trumpet-pods-server" },
-          { applicationId: "wrk-1", name: "trumpet-pods-workers" },
+          { applicationId: "web-1", name: "trumpet-pods-web" },
         ],
         name: "trumpet-pods",
       },
@@ -224,7 +224,7 @@ describe("Dokploy adapter", () => {
 
     expect(discovered).toEqual([
       { applicationId: "srv-1", label: "trumpet-pods / trumpet-pods-server" },
-      { applicationId: "wrk-1", label: "trumpet-pods / trumpet-pods-workers" },
+      { applicationId: "web-1", label: "trumpet-pods / trumpet-pods-web" },
     ]);
   });
 
@@ -285,28 +285,5 @@ describe("Dokploy adapter", () => {
     expect(body.env).toContain("EXISTING=keep-me");
     expect(body.env).toContain(`DATABASE_URL=${CANARY}`);
     expect(applications[0]?.state.names.has("DATABASE_URL")).toBe(true);
-  });
-
-  it("does not send a server-only value to the workers application", async () => {
-    respond({});
-    const client = createDokployClient("https://dokploy.example.com", "token");
-    const workers = {
-      id: "wrk-1",
-      name: "workers" as const,
-      state: { envText: "", names: new Set<string>() },
-    };
-
-    await applyDokploy(
-      planWrites(["CORS_ORIGIN"], "staging", emptyRemoteState()),
-      {
-        order: ["CORS_ORIGIN"],
-        values: new Map([["CORS_ORIGIN", CANARY]]),
-      },
-      client,
-      [workers]
-    );
-
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(workers.state.names.has("CORS_ORIGIN")).toBe(false);
   });
 });

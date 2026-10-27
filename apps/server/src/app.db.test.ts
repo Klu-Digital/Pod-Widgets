@@ -48,10 +48,10 @@ describe("x-request-id", () => {
 });
 
 describe("GET /health/ready", () => {
-  it("is 503 until the queue has started, naming what is missing", async () => {
+  it("is 200 once the database answers", async () => {
     const response = await app.request("/health/ready");
 
-    expect(response.status).toBe(503);
+    expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ database: true });
   });
 });

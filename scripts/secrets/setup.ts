@@ -16,7 +16,6 @@ export { generateSecret } from "./generate";
 export const LOCAL_FILES = {
   "local-server": "apps/server/.env",
   "local-web": "apps/web/.env",
-  "local-workers": "apps/workers/.env",
 } as const;
 
 export const readValues = (content: string): Map<string, string> => {
@@ -102,9 +101,7 @@ export const setupLocalEnvironment = (root: string): SetupResult => {
         path.join(root, LOCAL_FILES[target as keyof typeof LOCAL_FILES])
       );
 
-    // One value per name across every file that wants it. PROMETHEUS_METRICS_TOKEN
-    // goes to both the server and the workers, and a scrape config configured
-    // against one of two different tokens would 401 on the other.
+    // One value per name across every file that wants it, so a rerun reuses it.
     const existing = paths
       .map((filePath) => valuesByFile.get(filePath)?.get(entry.name))
       .find(Boolean);

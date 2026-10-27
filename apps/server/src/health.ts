@@ -1,7 +1,6 @@
 import { db } from "@trumpet-pods/db";
 import { log, parseError } from "@trumpet-pods/observability";
 import type { EvlogVariables } from "@trumpet-pods/observability/hono";
-import { queue } from "@trumpet-pods/queue";
 import { sql } from "drizzle-orm";
 import type { Hono } from "hono";
 
@@ -16,16 +15,9 @@ export const mountHealth = (app: Hono<EvlogVariables>) => {
       log.warn({ action: "health.db_unreachable", ...parseError(error) });
     }
 
-    const queueStarted = queue.isStarted();
-    const ready = database && queueStarted;
-
     return c.json(
-      {
-        database,
-        queue: queueStarted,
-        status: ready ? "ready" : "unavailable",
-      },
-      ready ? 200 : 503
+      { database, status: database ? "ready" : "unavailable" },
+      database ? 200 : 503
     );
   });
 };

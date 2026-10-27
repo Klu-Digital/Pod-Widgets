@@ -146,7 +146,7 @@ const collect = (collection: Collection, name: string, value: string): void => {
 
 interface Application {
   id: string;
-  name: "server" | "workers";
+  name: "server";
   state: DokployApplicationState;
 }
 
@@ -162,11 +162,7 @@ const remoteStateFrom = (
     snapshot.repositoryVariables.keys()
   );
   for (const application of applications) {
-    if (application.name === "server") {
-      state.dokployServer = application.state.names;
-    } else {
-      state.dokployWorkers = application.state.names;
-    }
+    state.dokployServer = application.state.names;
   }
   return state;
 };
@@ -357,7 +353,6 @@ const setUpDokploy = async (
   const ids = new Map<string, string>();
   for (const [variable, label] of [
     ["DOKPLOY_SERVER_APPLICATION_ID", "server"],
-    ["DOKPLOY_WORKERS_APPLICATION_ID", "workers"],
     ["DOKPLOY_WEB_APPLICATION_ID", "web"],
   ] as const) {
     const configured = existing.get(variable);
@@ -374,7 +369,6 @@ const setUpDokploy = async (
   const applications: Application[] = [];
   for (const [name, variable] of [
     ["server", "DOKPLOY_SERVER_APPLICATION_ID"],
-    ["workers", "DOKPLOY_WORKERS_APPLICATION_ID"],
   ] as const) {
     const id = ids.get(variable);
     if (!id) {

@@ -35,7 +35,7 @@ const CANARY = "THIS_MUST_NEVER_APPEAR";
 
 const makeFixture = (): string => {
   const root = mkdtempSync(path.join(os.tmpdir(), "trumpet-pods-secrets-"));
-  for (const app of ["server", "web", "workers"]) {
+  for (const app of ["server", "web"]) {
     const directory = path.join(root, "apps", app);
     mkdirSync(directory, { recursive: true });
     cpSync(
@@ -86,7 +86,7 @@ describe("local setup", () => {
 
       const result = setupLocalEnvironment(root);
 
-      expect(result.createdFiles).toContain("apps/workers/.env");
+      expect(result.createdFiles).toContain("apps/web/.env");
       expect(readFileSync(serverEnv, "utf-8")).toContain(
         `PROMETHEUS_METRICS_TOKEN=${existing}`
       );
@@ -163,12 +163,7 @@ describe("local setup", () => {
 
 describe("manifest", () => {
   it("covers variables declared by the environment schemas", () => {
-    const schemaFiles = [
-      "shared-server.ts",
-      "server.ts",
-      "workers.ts",
-      "web.ts",
-    ];
+    const schemaFiles = ["shared-server.ts", "server.ts", "web.ts"];
     const declared = new Set<string>();
     for (const file of schemaFiles) {
       const source = readFileSync(
@@ -210,20 +205,6 @@ describe("manifest", () => {
         `${entry.name} is sent to GitHub but no workflow reads it`
       ).toBe(true);
     }
-  });
-
-  it("keeps the API's CORS origin away from the workers runtime", () => {
-    const entry = configManifest.find(
-      (candidate) => candidate.name === "CORS_ORIGIN"
-    );
-    expect(entry?.targets).not.toContain("dokploy-workers");
-    expect(entry?.targets).not.toContain("local-workers");
-
-    const workersSchema = readFileSync(
-      path.join(repoRoot, "packages/env/src/workers.ts"),
-      "utf-8"
-    );
-    expect(workersSchema).not.toContain("CORS_ORIGIN");
   });
 
   it("keeps the PostHog CI key out of the application runtime", () => {
@@ -275,11 +256,10 @@ describe("write planning", () => {
   it("skips destinations that already hold the name", () => {
     const state = emptyRemoteState();
     state.githubSecrets.add("DATABASE_URL");
-    state.dokployServer.add("DATABASE_URL");
 
     const writes = planWrites(["DATABASE_URL"], "staging", state);
 
-    expect(writes.map((write) => write.target)).toEqual(["dokploy-workers"]);
+    expect(writes.map((write) => write.target)).toEqual(["dokploy-server"]);
   });
 
   it("plans nothing for a fully configured name", () => {
@@ -373,8 +353,6 @@ const configured = (environment: DeploymentEnvironment): RemoteState => {
     for (const write of destinationsFor(entry.name, environment)) {
       if (write.target === "dokploy-server") {
         state.dokployServer.add(entry.name);
-      } else if (write.target === "dokploy-workers") {
-        state.dokployWorkers.add(entry.name);
       } else if (write.scope === "repository") {
         (write.secret
           ? state.githubRepositorySecrets
@@ -438,7 +416,6 @@ describe("deployment check", () => {
   it("does not fail a run only because something was unverifiable", () => {
     const state = configured("staging");
     state.dokployServer.clear();
-    state.dokployWorkers.clear();
 
     const result = evaluateRemote(
       "staging",

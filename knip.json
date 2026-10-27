@@ -20,12 +20,6 @@
     "packages/db": {
       "ignoreDependencies": ["fishery"]
     },
-    "packages/queue": {
-      "ignoreIssues": {
-        "src/index.ts": ["exports", "types"]
-      },
-      "includeEntryExports": true
-    },
     "packages/storage": {
       "ignoreIssues": {
         "src/**": ["exports", "types"]

@@ -2,13 +2,11 @@ export type ConfigKind = "generated-secret" | "provider-secret" | "config";
 
 export type ConfigTarget =
   | "local-server"
-  | "local-workers"
   | "local-web"
   | "github-repository"
   | "github-staging"
   | "github-production"
-  | "dokploy-server"
-  | "dokploy-workers";
+  | "dokploy-server";
 
 export interface ConfigEntry {
   name: string;
@@ -32,12 +30,7 @@ export const configManifest = [
     kind: "provider-secret",
     name: "DATABASE_URL",
     required: true,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Dokploy API token for deployment requests",
@@ -68,35 +61,11 @@ export const configManifest = [
     targets: ["github-staging", "github-production"],
   },
   {
-    description: "Dokploy workers application identifier",
-    kind: "config",
-    name: "DOKPLOY_WORKERS_APPLICATION_ID",
-    required: true,
-    targets: ["github-staging", "github-production"],
-  },
-  {
     description: "Runtime environment name",
     kind: "config",
     name: "NODE_ENV",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
-  },
-  {
-    description: "PostgreSQL schema owned by pg-boss",
-    kind: "config",
-    name: "PGBOSS_SCHEMA",
-    required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "API HTTP port",
@@ -124,12 +93,7 @@ export const configManifest = [
     kind: "provider-secret",
     name: "POSTHOG_PROJECT_API_KEY",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Non-secret PostHog project identifier",
@@ -143,168 +107,84 @@ export const configManifest = [
     kind: "config",
     name: "PROMETHEUS_METRICS_PATH",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Bearer token protecting Prometheus metrics",
     kind: "generated-secret",
     name: "PROMETHEUS_METRICS_TOKEN",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
-  },
-  {
-    description: "Whether pg-boss uses PostgreSQL notifications",
-    kind: "config",
-    name: "QUEUE_LISTEN_NOTIFY",
-    required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
-  },
-  {
-    description: "Maximum pg-boss connections per process",
-    kind: "config",
-    name: "QUEUE_POOL_MAX",
-    required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Prefix for Redis keys",
     kind: "config",
     name: "REDIS_KEY_PREFIX",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Optional Redis connection string",
     kind: "provider-secret",
     name: "REDIS_URL",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Object-storage access key",
     kind: "provider-secret",
     name: "S3_ACCESS_KEY_ID",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Object-storage bucket name",
     kind: "config",
     name: "S3_BUCKET",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Server-to-bucket endpoint",
     kind: "config",
     name: "S3_ENDPOINT",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Use path-style object-storage URLs",
     kind: "config",
     name: "S3_FORCE_PATH_STYLE",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Bucket endpoint embedded in browser upload URLs",
     kind: "config",
     name: "S3_PUBLIC_ENDPOINT",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Object-storage region",
     kind: "config",
     name: "S3_REGION",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Object-storage secret access key",
     kind: "provider-secret",
     name: "S3_SECRET_ACCESS_KEY",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "Service name attached to log records",
     kind: "config",
     name: "SERVICE_NAME",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description: "URL checked after deployment",
@@ -318,12 +198,7 @@ export const configManifest = [
     kind: "config",
     name: "STORAGE_MAX_UPLOAD_BYTES",
     required: false,
-    targets: [
-      "local-server",
-      "local-workers",
-      "dokploy-server",
-      "dokploy-workers",
-    ],
+    targets: ["local-server", "dokploy-server"],
   },
   {
     description:
@@ -353,27 +228,6 @@ export const configManifest = [
     name: "VITE_SERVER_URL",
     required: true,
     targets: ["local-web"],
-  },
-  {
-    description: "Jobs processed concurrently per queue",
-    kind: "config",
-    name: "WORKERS_CONCURRENCY",
-    required: false,
-    targets: ["local-workers", "dokploy-workers"],
-  },
-  {
-    description: "Worker polling interval",
-    kind: "config",
-    name: "WORKERS_POLLING_INTERVAL_SECONDS",
-    required: false,
-    targets: ["local-workers", "dokploy-workers"],
-  },
-  {
-    description: "Worker health and metrics HTTP port",
-    kind: "config",
-    name: "WORKERS_PORT",
-    required: false,
-    targets: ["local-workers", "dokploy-workers"],
   },
 ] as const satisfies readonly ConfigEntry[];
 

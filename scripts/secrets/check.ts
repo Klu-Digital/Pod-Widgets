@@ -140,7 +140,6 @@ export interface RemoteInspection {
 
 const GROUPS = {
   "dokploy-server": "Dokploy server",
-  "dokploy-workers": "Dokploy workers",
   "github-secret": "GitHub",
   "github-variable": "GitHub",
 } as const;
@@ -153,8 +152,7 @@ export const evaluateRemote = (
 
   for (const entry of configManifest) {
     for (const write of destinationsFor(entry.name, environment)) {
-      const dokploy =
-        write.target === "dokploy-server" || write.target === "dokploy-workers";
+      const dokploy = write.target === "dokploy-server";
       const reachable = dokploy
         ? inspection.dokploy.available
         : inspection.github.available && inspection.github.environmentExists;
@@ -162,8 +160,6 @@ export const evaluateRemote = (
       let present = false;
       if (write.target === "dokploy-server") {
         present = inspection.state.dokployServer.has(entry.name);
-      } else if (write.target === "dokploy-workers") {
-        present = inspection.state.dokployWorkers.has(entry.name);
       } else if (write.scope === "repository") {
         present = write.secret
           ? inspection.state.githubRepositorySecrets.has(entry.name)
@@ -260,7 +256,6 @@ export const inspectRemote = async (
   const dokploy = createDokployClient(dokployUrl, token);
   const applications = [
     ["DOKPLOY_SERVER_APPLICATION_ID", "dokployServer"],
-    ["DOKPLOY_WORKERS_APPLICATION_ID", "dokployWorkers"],
   ] as const;
   try {
     for (const [variable, field] of applications) {

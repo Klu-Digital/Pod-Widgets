@@ -8,9 +8,6 @@ let db: Database | undefined;
 /** Comma-joined quoted table list for `TRUNCATE`; `undefined` = not discovered. */
 let cachedTableList: string | undefined;
 
-/** pg-boss job table, `""` when not installed, `undefined` = not discovered. */
-let cachedQueueTable: string | undefined;
-
 /**
  * Reads `process.env.DATABASE_URL` at call time: `setup/db.ts` sets it per
  * worker, possibly after this module was imported.
@@ -28,29 +25,6 @@ export const getTestDb = (): Database => {
     db = createDb(getTestPool());
   }
   return db;
-};
-
-/**
- * Only the job table. `queue` and `schedule` are schema-shaped rather than
- * data, and every test needs them.
- */
-const truncateQueueJobs = async (client: Pool): Promise<void> => {
-  if (cachedQueueTable === undefined) {
-    const schema = process.env.PGBOSS_SCHEMA ?? "pgboss";
-    // to_regclass returns null rather than throwing, so this doubles as the
-    // "is pg-boss installed at all?" probe.
-    const result = await client.query<{ reg: string | null }>(
-      "SELECT to_regclass($1) AS reg",
-      [`${schema}.job`]
-    );
-    cachedQueueTable = result.rows[0]?.reg ? `"${schema}".job` : "";
-  }
-
-  if (!cachedQueueTable) {
-    return;
-  }
-
-  await client.query(`TRUNCATE ${cachedQueueTable} CASCADE`);
 };
 
 /**
@@ -73,8 +47,6 @@ export const truncateAll = async (): Promise<void> => {
   if (cachedTableList) {
     await client.query(`TRUNCATE ${cachedTableList} RESTART IDENTITY CASCADE`);
   }
-
-  await truncateQueueJobs(client);
 };
 
 /** Ends the pool and clears every memoised value. */
@@ -85,5 +57,4 @@ export const closeTestPool = async (): Promise<void> => {
   pool = undefined;
   db = undefined;
   cachedTableList = undefined;
-  cachedQueueTable = undefined;
 };

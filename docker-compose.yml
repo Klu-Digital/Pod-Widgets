@@ -24,7 +24,7 @@ services:
       # Note the port is ${SERVER_PORT}, not a fixed 1900: the server binds
       # PORT to that same variable, so it moves the container-internal port too.
       SERVER_UPSTREAM: http://server:${SERVER_PORT:-1900}
-    # Healthchecks for web, server and workers live in their Dockerfiles.
+    # Healthchecks for web and server live in their Dockerfiles.
     depends_on:
       server:
         condition: service_healthy
@@ -66,33 +66,6 @@ services:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
-    restart: unless-stopped
-
-  # Consumes the job queue. No ports published: the HTTP server it runs exists
-  # only for the image's healthcheck and for Prometheus to scrape from inside the
-  # compose network.
-  workers:
-    build:
-      context: .
-      dockerfile: apps/workers/Dockerfile
-    init: true
-    env_file:
-      - path: apps/workers/.env
-        required: false
-    environment:
-      SERVICE_NAME: trumpet-pods-workers
-      WORKERS_PORT: ${WORKERS_PORT:-1901}
-      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/trumpet-pods
-      # Import jobs read uploaded CSVs from the bucket over the compose network.
-      S3_ENDPOINT: http://minio:9000
-      S3_BUCKET: ${S3_BUCKET:-trumpet-pods}
-      S3_REGION: us-east-1
-      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-minioadmin}
-      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
-      S3_FORCE_PATH_STYLE: "true"
-    depends_on:
-      postgres:
-        condition: service_healthy
     restart: unless-stopped
 
   postgres:

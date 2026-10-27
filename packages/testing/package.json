@@ -16,10 +16,8 @@
   "dependencies": {
     "@trumpet-pods/db": "workspace:*",
     "@trumpet-pods/env": "workspace:*",
-    "@trumpet-pods/queue": "workspace:*",
     "ioredis": "catalog:",
-    "pg": "catalog:",
-    "pg-boss": "catalog:"
+    "pg": "catalog:"
   },
   "devDependencies": {
     "@testcontainers/postgresql": "^12.2.0",

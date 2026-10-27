@@ -9,7 +9,6 @@ export default defineConfig({
       "apps/web/.tanstack/**",
       "apps/web/src/routeTree.gen.ts",
       "apps/server/dist/**",
-      "apps/workers/dist/**",
       "packages/db/dist/**",
       "packages/db/src/migrations/**",
       "packages/observability/dist/**",
@@ -26,7 +25,6 @@ export default defineConfig({
       "apps/web/.tanstack/**",
       "apps/web/src/routeTree.gen.ts",
       "apps/server/dist/**",
-      "apps/workers/dist/**",
       "packages/db/dist/**",
       "packages/db/src/migrations/**",
       "packages/observability/dist/**",
@@ -48,7 +46,7 @@ export default defineConfig({
           // Enumerated rather than "apps/*": the web app's tests need jsdom and
           // belong to the "web" project below, not this node one.
           include: [
-            "apps/{server,workers}/src/**/*.test.ts",
+            "apps/server/src/**/*.test.ts",
             "packages/*/src/**/*.test.ts",
             "scripts/**/*.test.ts",
           ],

@@ -7,7 +7,6 @@
     "./flags": "./src/flags.ts",
     "./server": "./src/server.ts",
     "./shared-server": "./src/shared-server.ts",
-    "./workers": "./src/workers.ts",
     "./web": "./src/web.ts"
   },
   "scripts": {

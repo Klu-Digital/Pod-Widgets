@@ -8,7 +8,6 @@ import path from "node:path";
 
 // Must load before @trumpet-pods/db, hence the dynamic imports below.
 import { log, observability, parseError } from "@trumpet-pods/observability";
-import { migrateQueueSchema } from "@trumpet-pods/queue";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import postMigrationScripts from "virtual:post-migration-scripts";
 
@@ -25,7 +24,6 @@ try {
   } finally {
     await pool.end();
   }
-  await migrateQueueSchema();
   log.info({ action: "server.migrated" });
 } catch (error) {
   log.error({ action: "server.migrate_failed", ...parseError(error) });

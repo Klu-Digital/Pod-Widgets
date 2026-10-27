@@ -73,7 +73,7 @@ jobs:
             if [ "$major" != "0" ]; then tags+=("$major"); fi
           fi
 
-          for app in web server workers; do
+          for app in web server; do
             image="${REGISTRY}/${repo}/${app}"
             if ! docker buildx imagetools inspect "${image}:${src_tag}" > /dev/null 2>&1; then
               echo "::error::${image}:${src_tag} does not exist. Was ${sha} built by release.yml, and is that run finished?"
@@ -81,7 +81,7 @@ jobs:
             fi
           done
 
-          for app in web server workers; do
+          for app in web server; do
             image="${REGISTRY}/${repo}/${app}"
             args=()
             for t in "${tags[@]}"; do args+=(-t "${image}:${t}"); done
