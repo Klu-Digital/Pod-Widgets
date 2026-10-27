@@ -1,5 +1,5 @@
 import { call } from "@orpc/server";
-import { widgetAudit } from "@trumpet-pods/db/schema/widgets";
+import { widget, widgetAudit } from "@trumpet-pods/db/schema/widgets";
 import { getTestDb } from "@trumpet-pods/testing";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -54,6 +54,51 @@ describe("widgets", () => {
     expect(edited?.updatedAt.getTime()).toBeGreaterThan(
       created.updatedAt.getTime()
     );
+  });
+
+  it("keeps content independent between widgets on one page", async () => {
+    const { id: pageId } = await newPage();
+    const first = await call(
+      appRouter.widgets.create,
+      { pageId, type: "text" },
+      { context }
+    );
+    const second = await call(
+      appRouter.widgets.create,
+      { pageId, type: "text" },
+      { context }
+    );
+
+    await call(
+      appRouter.widgets.updateContent,
+      { content: doc("first"), id: first.id },
+      { context }
+    );
+    const listed = await call(appRouter.widgets.list, { pageId }, { context });
+
+    expect(listed.find((row) => row.id === first.id)).toMatchObject({
+      content: doc("first"),
+    });
+    expect(listed.find((row) => row.id === second.id)).toEqual(second);
+  });
+
+  it("rejects a mutation without identity headers and writes nothing", async () => {
+    const { id: pageId } = await newPage();
+
+    await expect(
+      call(
+        appRouter.widgets.create,
+        { pageId, type: "text" },
+        {
+          context: {
+            ...context,
+            identityHeaders: { id: undefined, name: undefined },
+          },
+        }
+      )
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+
+    expect(await getTestDb().select().from(widget)).toHaveLength(0);
   });
 
   it("soft deletes and restores, auditing each real transition", async () => {
