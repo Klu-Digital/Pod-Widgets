@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import {
   EMPTY_DOC,
   RichTextEditor,
@@ -7,10 +7,17 @@ import type { RichTextDoc } from "@trumpet-pods/ui/components/rich-text-editor";
 import { expect, it, vi } from "vite-plus/test";
 
 interface MountedEditor {
-  commands: { insertContent: (content: string) => boolean };
+  commands: {
+    focus: () => boolean;
+    insertContent: (content: string) => boolean;
+    selectAll: () => boolean;
+  };
   getJSON: () => unknown;
   getText: () => string;
 }
+
+// jsdom has no layout; ProseMirror maps a mousedown to a position with it.
+document.elementFromPoint = () => null;
 
 const paragraph = (text: string): RichTextDoc => ({
   content: [{ content: [{ text, type: "text" }], type: "paragraph" }],
@@ -69,4 +76,33 @@ it("keeps two editors independent and emits JSON docs", async () => {
     </>
   );
   expect(editorOf("first").getText()).toBe("hello");
+});
+
+it("reads as text until clicked, then edits with a floating toolbar", async () => {
+  render(
+    <RichTextEditor
+      aria-label="note"
+      onChange={vi.fn()}
+      value={paragraph("hello")}
+    />
+  );
+  const textbox = await screen.findByLabelText("note");
+  expect(textbox).toHaveAttribute("contenteditable", "false");
+  expect(textbox).toHaveTextContent("hello");
+  expect(screen.queryByRole("toolbar")).not.toBeInTheDocument();
+
+  fireEvent.mouseDown(textbox);
+  expect(textbox).toHaveAttribute("contenteditable", "true");
+
+  act(() => {
+    editorOf("note").commands.focus();
+    editorOf("note").commands.selectAll();
+  });
+  const toolbar = await screen.findByRole("toolbar", { name: "Formatting" });
+  expect(toolbar).toContainElement(
+    screen.getByRole("button", { name: "Bold" })
+  );
+
+  fireEvent.keyDown(textbox, { key: "Escape" });
+  expect(textbox).toHaveAttribute("contenteditable", "false");
 });

@@ -42,6 +42,7 @@ vi.mock("@/utils/client", () => ({
 Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
 Range.prototype.getBoundingClientRect = () => new DOMRect();
 window.scrollTo = vi.fn();
+document.elementFromPoint = () => null;
 
 const { WidgetBoard } = await import("@/components/widgets/widget-board");
 const { createQueryClient } = await import("@/utils/orpc");
@@ -50,7 +51,10 @@ const PAGE_ID = "0190a000-0000-7000-8000-000000000001";
 const WIDGET_ID = "0190a000-0000-7000-8000-000000000002";
 
 interface MountedEditor {
-  commands: { insertContent: (content: string) => boolean };
+  commands: {
+    focus: (position: "end") => boolean;
+    insertContent: (content: string) => boolean;
+  };
 }
 
 const editor = (): MountedEditor => {
@@ -127,6 +131,48 @@ it("adds a widget and coalesces edits into one save", async () => {
     },
     id: WIDGET_ID,
   });
+});
+
+it("shows saved widgets as text and edits one in place on click", async () => {
+  localStorage.setItem(
+    "pod-widgets:identity",
+    JSON.stringify({ id: "me", name: "Kevin" })
+  );
+  api.listWidgets.mockResolvedValue([
+    {
+      content: {
+        content: [
+          {
+            content: [{ marks: [{ type: "bold" }], text: "hi", type: "text" }],
+            type: "paragraph",
+          },
+        ],
+        type: "doc",
+      },
+      createdBy: "Kevin",
+      id: WIDGET_ID,
+      pageId: PAGE_ID,
+      type: "text",
+    },
+  ]);
+  renderBoard();
+
+  const text = await screen.findByLabelText("Widget text");
+  expect(text).toHaveAttribute("contenteditable", "false");
+  expect(screen.getByText("hi").tagName).toBe("STRONG");
+
+  fireEvent.mouseDown(text);
+  expect(text).toHaveAttribute("contenteditable", "true");
+  act(() => {
+    editor().commands.focus("end");
+    editor().commands.insertContent("!");
+  });
+  fireEvent.blur(text);
+
+  expect(text).toHaveAttribute("contenteditable", "false");
+  expect(text).toHaveTextContent("hi!");
+  await waitFor(() => expect(api.updateContent).toHaveBeenCalledTimes(1));
+  expect(api.updateContent.mock.calls[0]?.[0]).toMatchObject({ id: WIDGET_ID });
 });
 
 it("deletes a widget at once and brings it back with Undo", async () => {
