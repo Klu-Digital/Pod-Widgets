@@ -57,7 +57,7 @@ jobs:
   # ---------------------------------------------------------------------------
   resolve:
     name: Resolve images
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 10
     permissions:
       contents: read
@@ -129,7 +129,7 @@ jobs:
   deploy:
     name: Deploy applications
     needs: resolve
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 20
     environment: ${{ inputs.environment }}
     permissions:
@@ -244,7 +244,7 @@ jobs:
   record:
     name: Record deployment
     needs: [resolve, deploy]
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     timeout-minutes: 5
     permissions:
       contents: write
