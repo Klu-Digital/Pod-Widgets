@@ -147,11 +147,13 @@ jobs:
       # already configured with — which, if that is a moving tag, means the thing
       # you promoted is not necessarily the thing you verified.
       #
-      # Endpoint names track Dokploy's API and have moved between versions; check
-      # ${DOKPLOY_URL}/swagger if a call 404s. Registry credentials for GHCR are
-      # configured in Dokploy itself, not sent here. saveDockerProvider still
-      # requires the username/password/registryUrl keys and overwrites them, so
-      # the current values are read via application.one and sent back as-is.
+      # Dokploy's /api/<procedure> REST routes 404 on this instance, so this
+      # speaks the tRPC routes the dashboard itself uses: batch=1 with the input
+      # wrapped as {"0":{"json":{...}}}, and the result under
+      # .[0].result.data.json. Registry credentials for GHCR are configured in
+      # Dokploy itself, not sent here. saveDockerProvider still requires the
+      # username/password/registryUrl keys and overwrites them, so the current
+      # values are read via application.one and sent back as-is.
       - name: Set image and deploy
         env:
           DOKPLOY_URL: ${{ vars.DOKPLOY_URL }}
@@ -163,20 +165,28 @@ jobs:
         run: |
           set -euo pipefail
 
-          call() {
-            # No -f: with it curl discards the response body on a 4xx, which is
-            # where Dokploy explains what it rejected.
-            local body status
+          # tRPC reports procedure errors in the body, sometimes alongside a 2xx
+          # in a batch, so check both. No -f: with it curl discards the response
+          # body on a 4xx, which is where Dokploy explains what it rejected.
+          trpc() {
+            local method="$1" proc="$2" input="$3" body status
+            local url="${DOKPLOY_URL}/api/trpc/${proc}?batch=1"
             body="$(mktemp)"
-            status="$(curl -sS -o "$body" -w '%{http_code}' \
-              -X POST "${DOKPLOY_URL}/api/$1" \
-              -H "x-api-key: ${DOKPLOY_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d "$2")"
-            if [ "$status" -ge 400 ]; then
-              echo "::error::$1 returned HTTP ${status}: $(cat "$body")"
+            if [ "$method" = GET ]; then
+              status="$(curl -sS -o "$body" -w '%{http_code}' -G "$url" \
+                -H "x-api-key: ${DOKPLOY_TOKEN}" \
+                --data-urlencode "input=$(jq -nc --argjson i "$input" '{"0": {json: $i}}')")"
+            else
+              status="$(curl -sS -o "$body" -w '%{http_code}' -X POST "$url" \
+                -H "x-api-key: ${DOKPLOY_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "$(jq -nc --argjson i "$input" '{"0": {json: $i}}')")"
+            fi
+            if [ "$status" -ge 400 ] || jq -e '.[0].error' "$body" > /dev/null 2>&1; then
+              echo "::error::${proc} returned HTTP ${status}: $(cat "$body")" >&2
               exit 1
             fi
+            jq -c '.[0].result.data.json' "$body"
           }
 
           release() {
@@ -189,17 +199,15 @@ jobs:
             # saveDockerProvider overwrites the registry credentials with whatever
             # it is sent, so read the stored ones and echo them back unchanged.
             local current
-            current="$(curl -fsS -G "${DOKPLOY_URL}/api/application.one" \
-              -H "x-api-key: ${DOKPLOY_TOKEN}" \
-              --data-urlencode "applicationId=${id}")"
-            call application.saveDockerProvider \
-              "$(jq -n --arg id "$id" --arg image "$image" --argjson cur "$current" \
+            current="$(trpc GET application.one "$(jq -nc --arg id "$id" '{applicationId: $id}')")"
+            trpc POST application.saveDockerProvider \
+              "$(jq -nc --arg id "$id" --arg image "$image" --argjson cur "$current" \
                   '{applicationId: $id, dockerImage: $image,
                     username: ($cur.username // null),
                     password: ($cur.password // null),
-                    registryUrl: ($cur.registryUrl // null)}')"
-            call application.deploy \
-              "$(jq -n --arg id "$id" '{applicationId: $id}')"
+                    registryUrl: ($cur.registryUrl // null)}')" > /dev/null
+            trpc POST application.deploy \
+              "$(jq -nc --arg id "$id" '{applicationId: $id}')" > /dev/null
           }
 
           # Web last so the SPA is the final thing to change under a user
