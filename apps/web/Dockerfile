@@ -5,7 +5,15 @@
 # readable tag alongside the digest; refresh both together with
 # `docker buildx imagetools inspect <tag>`. The Node major must stay in step with
 # .nvmrc, which CI and package.json `engines` follow too.
-FROM node:26-slim@sha256:ec7758ee051e457b468b32bde57b0879010b325bb9862718e9615225ce4aaae1 AS builder
+#
+# The builder is pinned to the build host's platform (`--platform=$BUILDPLATFORM`)
+# rather than the target's. Its output is static files, identical for every
+# architecture, so there is no reason to run it per target — and under QEMU
+# emulation (the arm64 target on an x86 runner) rolldown, which is multi-threaded
+# native code, intermittently hangs at "transforming...". Only the runner stage
+# below is built per platform. The digest is the multi-arch index, so it resolves
+# to the right variant for the build host.
+FROM --platform=$BUILDPLATFORM node:26-slim@sha256:ec7758ee051e457b468b32bde57b0879010b325bb9862718e9615225ce4aaae1 AS builder
 WORKDIR /app
 # The pnpm version comes from `packageManager`, so package.json stays the one
 # place it is bumped — the same one CI's pnpm/action-setup reads.
