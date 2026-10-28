@@ -3,7 +3,6 @@
 A small web app for adding independent widgets to a page. Each widget keeps its own content, saves to the backend as you type, and is still there after a refresh.
 
 - **Widgets:** rich-text and banner (info / idea / warning / success) widgets, added with a button and deleted with Undo.
-- **Pages:** multiple pages, with an activity log of widget creates, deletes and restores.
 - **Identity:** no accounts. You enter a name on first visit and it is kept in the browser, which is how widgets show who created them.
 
 Stack: React + TanStack Router, Hono + oRPC, Postgres + Drizzle, in a pnpm workspace.
@@ -55,11 +54,3 @@ Other checks: `pnpm check` (lint + format) and `pnpm check-types`.
 ## Prompts
 
 The prompts used to build this with Claude Code are in [PROMPTS.md](PROMPTS.md).
-
-## More
-
-[CONTRIBUTING.md](CONTRIBUTING.md) · [AGENTS.md](AGENTS.md) (conventions and invariants) · [docs/self-hosting.md](docs/self-hosting.md) · [docs/adr/](docs/adr/)
-
-## License
-
-MIT, see [LICENSE](LICENSE).
